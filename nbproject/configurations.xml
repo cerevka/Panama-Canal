@@ -28,6 +28,8 @@
                    kind="IMPORTANT_FILES_FOLDER">
       <itemPath>Makefile</itemPath>
     </logicalFolder>
+    <itemPath>/media/data/Documents/CTU/6/pgr/PanamaCanal/Enviroment.cpp</itemPath>
+    <itemPath>/media/data/Documents/CTU/6/pgr/PanamaCanal/Enviroment.h</itemPath>
   </logicalFolder>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -38,6 +40,9 @@
         <platform>2</platform>
       </toolsSet>
       <compileType>
+        <ccTool>
+          <commandlineTool>g++</commandlineTool>
+        </ccTool>
         <linkerTool>
           <linkerLibItems>
             <linkerOptionItem>-lglut -lGLU</linkerOptionItem>

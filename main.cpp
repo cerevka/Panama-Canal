@@ -6,16 +6,73 @@
  */
 
 #include <cstdlib>
+#include <iostream>
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/freeglut.h>
 
+#include "Enviroment.h"
+
 using namespace std;
 
-/*
- * 
+#define TITLE "Panama Canal"
+#define WIDTH 500
+#define HEIGHT 500
+
+/**
+ * Vstupni bod programu.
+ * @param argc Pocet argumentu.
+ * @param argv Argumenty.
+ * @return Navratova hodnota.
  */
 int main(int argc, char** argv) {
+    Enviroment * enviroment = Enviroment::getInstance();
+
+    cout << enviroment;
+
+
+
+    /* Initialize the GLUT library. */
+    glutInit(&argc, argv);
+
+    
+
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
+    glutInitWindowPosition(5, 5);
+    glutInitWindowSize(WIDTH, HEIGHT);
+
+    /* Creation of the main window, setting of callbacks. */
+    glutCreateWindow(TITLE);
+    //glutDisplayFunc(myDisplay);
+    //void ()
+    glutDisplayFunc(Enviroment::display);
+    glutReshapeFunc(Enviroment::reshape);
+    glutKeyboardFunc(Enviroment::keyboard);
+    glutSpecialFunc(Enviroment::specialKeyboard);
+    //glutIdleFunc(Enviroment::idle);
+
+    /* Create main menu. */
+    glutCreateMenu(Enviroment::menu);
+    glutAddMenuEntry("Task 1 - Circular motion of car", 1);
+    glutAddMenuEntry("Task 2 - Circular motion of camera", 2);
+    glutAddMenuEntry("Task 3 - Free motion in xz-plane (WALK mode)", 3);
+    glutAddMenuEntry("Bonus - WALK mode + up/down", 4);
+    glutAddMenuEntry("Quit", 5);
+
+    /* Menu will be invoked by the right button. */
+    glutAttachMenu(GLUT_RIGHT_BUTTON);
+
+    //init();
+    enviroment->init();
+
+    
+
+    /* Run main loop - processing of events. */
+    glutMainLoop();
+
+   
+
+    delete enviroment;
 
     return 0;
 }
