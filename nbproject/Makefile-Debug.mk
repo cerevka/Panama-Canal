@@ -33,7 +33,8 @@ OBJECTDIR=build/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/main.o
+	${OBJECTDIR}/main.o \
+	${OBJECTDIR}/_ext/1128534263/Enviroment.o
 
 
 # C Compiler Flags
@@ -64,6 +65,11 @@ ${OBJECTDIR}/main.o: main.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} $@.d
 	$(COMPILE.cc) -g -MMD -MP -MF $@.d -o ${OBJECTDIR}/main.o main.cpp
+
+${OBJECTDIR}/_ext/1128534263/Enviroment.o: /media/data/Documents/CTU/6/pgr/PanamaCanal/Enviroment.cpp 
+	${MKDIR} -p ${OBJECTDIR}/_ext/1128534263
+	${RM} $@.d
+	$(COMPILE.cc) -g -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/1128534263/Enviroment.o /media/data/Documents/CTU/6/pgr/PanamaCanal/Enviroment.cpp
 
 # Subprojects
 .build-subprojects:
