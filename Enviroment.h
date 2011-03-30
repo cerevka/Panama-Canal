@@ -3,13 +3,35 @@
 
 #include <GL/gl.h>
 #include <GL/freeglut.h>
-#include <boost/config.hpp>
+
+#include <iostream>
+
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
+
+using namespace std;
+using namespace boost::property_tree;
 
 /**
  * Trida starajici se o prostredi OpenGL. Singleton.
  */
 class Enviroment {
 public:
+
+    /**
+     * Sirka okna.
+     */
+    int windowWidth;
+
+    /**
+     * Vyska okna.
+     */
+    int windowHeight;
+
+    /**
+     * Titulek okna.
+     */
+    string windowTitle;
 
     /**
      * Destruuje Enviroment.
@@ -81,11 +103,20 @@ private:
     static Enviroment * instance;
 
     /**
+     * Uchovava nactene nastaveni.
+     */
+    ptree config;
+
+    /**
      * Soukromy konstruktor - singleton.
      */
     Enviroment(void);
 
-
+    /**
+     * Nacte nastaveni z daneho souboru.
+     * @param file
+     */
+    void loadConfig(const string &file);
 
 };
 

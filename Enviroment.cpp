@@ -3,6 +3,10 @@
 Enviroment * Enviroment::instance = NULL;
 
 Enviroment::Enviroment(void) {
+    // Nacte konfiguraci.
+    loadConfig("config.xml");
+
+    // Ulozi si ukazatel na sebe sama.
     instance = this;
 }
 
@@ -118,7 +122,6 @@ void Enviroment::menu(int menuItem) {
     }
 }
 
-
 void Enviroment::init(void) {
     glEnable(GL_DEPTH_TEST);
 
@@ -153,4 +156,20 @@ void Enviroment::drawScene(void) {
     glPopMatrix();
 
     //drawCircle(R);
+}
+
+void Enviroment::loadConfig(const string& file) {
+    // Nacte se XML soubor.
+    try {
+        read_xml(file, config);
+        windowWidth = config.get<int>("config.window.width");
+        windowHeight = config.get<int>("config.window.height");
+        windowTitle = config.get<string > ("config.window.title");
+    } catch (xml_parser_error) {
+        cerr << "Enviroment::loadConfig -> XML Parser Error." << endl;
+    } catch (ptree_bad_path) {
+        cerr << "Enviroment::loadConfig -> PTree Bad Path." << endl;
+    } catch (ptree_bad_data) {
+        cerr << "Enviroment::loadConfig -> PTree Bad Data." << endl;
+    }
 }

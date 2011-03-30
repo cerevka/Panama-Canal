@@ -26,32 +26,24 @@ using namespace std;
  * @return Navratova hodnota.
  */
 int main(int argc, char** argv) {
-    Enviroment * enviroment = Enviroment::getInstance();
-
-    cout << enviroment;
-
-
+    Enviroment * enviroment = Enviroment::getInstance();   
 
     /* Initialize the GLUT library. */
-    glutInit(&argc, argv);
-
-    
+    glutInit(&argc, argv);  
 
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
     glutInitWindowPosition(5, 5);
-    glutInitWindowSize(WIDTH, HEIGHT);
+    glutInitWindowSize(enviroment->windowWidth, enviroment->windowHeight);
 
-    /* Creation of the main window, setting of callbacks. */
-    glutCreateWindow(TITLE);
-    //glutDisplayFunc(myDisplay);
-    //void ()
+    // Vytvoreni hlavniho okna a nastaveni callbacku.
+    glutCreateWindow(enviroment->windowTitle.c_str());
     glutDisplayFunc(Enviroment::display);
     glutReshapeFunc(Enviroment::reshape);
     glutKeyboardFunc(Enviroment::keyboard);
     glutSpecialFunc(Enviroment::specialKeyboard);
     //glutIdleFunc(Enviroment::idle);
 
-    /* Create main menu. */
+    // Vytvoreni hlavniho menu.
     glutCreateMenu(Enviroment::menu);
     glutAddMenuEntry("Task 1 - Circular motion of car", 1);
     glutAddMenuEntry("Task 2 - Circular motion of camera", 2);
@@ -59,18 +51,13 @@ int main(int argc, char** argv) {
     glutAddMenuEntry("Bonus - WALK mode + up/down", 4);
     glutAddMenuEntry("Quit", 5);
 
-    /* Menu will be invoked by the right button. */
+    // Menu se bude otevirat pravym mysitkem.
     glutAttachMenu(GLUT_RIGHT_BUTTON);
-
-    //init();
-    enviroment->init();
-
     
+    enviroment->init(); 
 
-    /* Run main loop - processing of events. */
-    glutMainLoop();
-
-   
+    // Spusti hlavni smysku.
+    glutMainLoop();   
 
     delete enviroment;
 
