@@ -4,7 +4,7 @@
 #include "Enviroment.h"
 
 Camera::Camera() {
-    viewingAngle = 0.0;
+    rotationAngle = 0.0;
     elevationAngle = 0.0;
 }
 
@@ -39,23 +39,23 @@ void Camera::look(void) {
 
     // Spocte smerove souradnice.
     setViewDirection(
-            cos(viewingAngle * DEG_TO_RAD) * cos(elevationAngle * DEG_TO_RAD),
+            cos(rotationAngle * DEG_TO_RAD) * cos(elevationAngle * DEG_TO_RAD),
             sin(elevationAngle * DEG_TO_RAD),
-            sin(viewingAngle * DEG_TO_RAD) * cos(elevationAngle * DEG_TO_RAD)
+            sin(rotationAngle * DEG_TO_RAD) * cos(elevationAngle * DEG_TO_RAD)
             );
 
     // Spocte souradnice pohybu.
     setMotionDirection(
-            cos(viewingAngle * DEG_TO_RAD),
+            cos(rotationAngle * DEG_TO_RAD),
             0.0,
-            sin(viewingAngle * DEG_TO_RAD)
+            sin(rotationAngle * DEG_TO_RAD)
             );
 
     // Spocte souradnice upvectoru.
     setUpvector(
-            -cos(viewingAngle * DEG_TO_RAD) * sin(elevationAngle * DEG_TO_RAD),
+            -cos(rotationAngle * DEG_TO_RAD) * sin(elevationAngle * DEG_TO_RAD),
             cos(elevationAngle * DEG_TO_RAD),
-            -sin(viewingAngle * DEG_TO_RAD) * sin(elevationAngle * DEG_TO_RAD)
+            -sin(rotationAngle * DEG_TO_RAD) * sin(elevationAngle * DEG_TO_RAD)
             );
 
     gluLookAt(
@@ -66,28 +66,28 @@ void Camera::look(void) {
 }
 
 void Camera::turnLeft(void) {
-    viewingAngle += angle;
-    if (viewingAngle > 360.0) {
-        viewingAngle -= 360.0;
+    rotationAngle += rotationAngleStep;
+    if (rotationAngle > 360.0) {
+        rotationAngle -= 360.0;
     }
 }
 
 void Camera::turnRight(void) {
-    viewingAngle -= angle;
-    if (viewingAngle < -360.0) {
-        viewingAngle += 360.0;
+    rotationAngle -= rotationAngleStep;
+    if (rotationAngle < -360.0) {
+        rotationAngle += 360.0;
     }
 }
 
 void Camera::turnUp(void) {
-    elevationAngle += angle;
+    elevationAngle += elevationAngleStep;
     if (elevationAngle > 75.0) {
         elevationAngle = 75.0;
     }
 }
 
 void Camera::turnDown(void) {
-    elevationAngle -= angle;
+    elevationAngle -= elevationAngleStep;
     if (elevationAngle < -75.0) {
         elevationAngle = -75.0;
     }

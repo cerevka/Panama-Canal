@@ -10,10 +10,13 @@ public:
     float step;
 
     /** Velikost uhlu rotace. */
-    float angle;
+    float rotationAngleStep;
+
+    /** Velikost uhlu naklonu. */
+    float elevationAngleStep;
 
     /** Aktualni uhel rotace v horizontalni poloze. */
-    float viewingAngle;
+    float rotationAngle;
 
     /** Aktualni uhel rotace ve vertikalni poloze. */
     float elevationAngle;

@@ -37,6 +37,8 @@ int main(int argc, char** argv) {
     glutReshapeFunc(Enviroment::reshape);
     glutKeyboardFunc(Enviroment::keyboard);
     glutSpecialFunc(Enviroment::specialKeyboard);
+    glutMouseFunc(Enviroment::mouse);
+    glutMotionFunc(Enviroment::mouseMotion);
     //glutIdleFunc(Enviroment::idle);
 
     // Vytvoreni hlavniho menu.

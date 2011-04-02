@@ -11,6 +11,8 @@ Enviroment::Enviroment(void) {
 
     // Ulozi si ukazatel na sebe sama.
     instance = this;
+
+    mouseLeftPressed = false;
 }
 
 Enviroment::~Enviroment(void) {
@@ -36,7 +38,7 @@ void Enviroment::display(void) {
     Enviroment::instance->drawScene();
 
     // Nakresli zem - zeleny obdelnik v rovine XZ.
-    glDisable(GL_LIGHTING);
+    glDisable(GL_LIGHTING);   
     glBegin(GL_QUADS);
     glColor3d(0.3, 0.8, 0.3);
     glVertex3d(-5.0, 0.0, -5.0);
@@ -44,9 +46,6 @@ void Enviroment::display(void) {
     glVertex3d(5.0, 0.0, 5.0);
     glVertex3d(5.0, 0.0, -5.0);
     glEnd();
-
-
-
 
     glEnable(GL_LIGHTING);
 
@@ -123,6 +122,39 @@ void Enviroment::specialKeyboard(int key, int x, int y) {
         }
         default:
             return;
+    }
+    glutPostRedisplay();
+}
+
+void Enviroment::mouse(int button, int state, int x, int y) {
+    if (button == GLUT_LEFT_BUTTON) {
+        if (state == GLUT_DOWN) {
+            Enviroment::getInstance()->mouseLeftPressed = true;
+            Enviroment::getInstance()->lastCoordinate[0] = x;
+            Enviroment::getInstance()->lastCoordinate[1] = y;
+        } else {
+            Enviroment::getInstance()->mouseLeftPressed = false;
+        }
+    }
+
+}
+
+void Enviroment::mouseMotion(int x, int y) {
+    Enviroment* enviroment = Enviroment::getInstance();
+    if (enviroment->mouseLeftPressed == true) {
+        if (x > enviroment->lastCoordinate[0]) {
+            enviroment->camera->turnLeft();
+        } else {
+            enviroment->camera->turnRight();
+        }
+
+        if (y > enviroment->lastCoordinate[1]) {
+            enviroment->camera->turnDown();
+        } else {
+            enviroment->camera->turnUp();
+        }
+        enviroment->lastCoordinate[0] = x;
+        enviroment->lastCoordinate[1] = y;
     }
     glutPostRedisplay();
 }
@@ -204,7 +236,8 @@ void Enviroment::loadConfig(const string& file) {
                 config.get<float>("config.camera.motion.z")
                 );
         camera->step = config.get<float>("config.camera.motion.step");
-        camera->angle = config.get<float>("config.camera.motion.angle");
+        camera->rotationAngleStep = config.get<float>("config.camera.motion.angle.rotation");
+        camera->elevationAngleStep = config.get<float>("config.camera.motion.angle.elevation");
 
     } catch (xml_parser_error) {
         cerr << "Enviroment::loadConfig -> XML Parser Error." << endl;

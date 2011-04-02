@@ -25,7 +25,10 @@
 			<y>0.0</y>
 			<z>-1.0</z>
 			<step>0.2</step>
-			<angle>3.0</angle>
+			<angle>
+				<rotation>3.0</rotation>
+				<elevation>0.5</elevation>
+			</angle>			
 		</motion>
 	</camera>
 </config>

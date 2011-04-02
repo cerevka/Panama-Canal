@@ -79,6 +79,22 @@ public:
     static void specialKeyboard(int key, int x, int y);
 
     /**
+     * Odchytava klikani mysi.
+     * @param int button Identifikator tlacitka.
+     * @param int state Identifikator stavu tlacitka.
+     * @param int x Xova souradnice.
+     * @param int y Yova souradnice.
+     */
+    static void mouse(int button, int state, int x, int y);
+
+    /**
+     * Odchytava pohyb mysi.
+     * @param int x Xova souradnice.
+     * @param int y Yova souradnice.
+     */
+    static void mouseMotion(int x, int y);
+
+    /**
      * Vola se, pokud se zrovna nic jineho nedeje.
      */
     static void idle(void);
@@ -109,6 +125,10 @@ private:
 
     /** Pouzivana kamera. */
     Camera * camera;
+
+    bool mouseLeftPressed;
+
+    int lastCoordinate[2];
 
     /**
      * Soukromy konstruktor - singleton.
