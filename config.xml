@@ -4,4 +4,28 @@
 		<height>500</height>
 		<title>Panama Canal</title>
 	</window>
+	<camera>
+		<position>
+			<x>0.0</x>
+			<y>0.5</y>
+			<z>0.0</z>
+		</position>
+		<direction>
+			<x>0.0</x>
+			<y>0.0</y>
+			<z>0.0</z>
+		</direction>
+		<upvector>
+			<x>0.0</x>
+			<y>1.0</y>
+			<z>0.0</z>
+		</upvector>
+		<motion>
+			<x>0.0</x>
+			<y>0.0</y>
+			<z>-1.0</z>
+			<step>0.2</step>
+			<angle>3.0</angle>
+		</motion>
+	</camera>
 </config>

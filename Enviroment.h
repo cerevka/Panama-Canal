@@ -1,6 +1,8 @@
 #ifndef ENVIROMENT_H
 #define	ENVIROMENT_H
 
+#define DEG_TO_RAD (3.14159/180.0)
+
 #include <GL/gl.h>
 #include <GL/freeglut.h>
 
@@ -8,6 +10,8 @@
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
+
+#include "Camera.h"
 
 using namespace std;
 using namespace boost::property_tree;
@@ -93,19 +97,18 @@ public:
     /**
      * Kresli scenu.
      */
-    void drawScene(void);
+    void drawScene(void);   
 
 private:
 
-    /**
-     * Ukazatel na instanci Enviroment;
-     */
+    /** Instance prostredi.  */
     static Enviroment * instance;
 
-    /**
-     * Uchovava nactene nastaveni.
-     */
+    /** Nastaveni. */
     ptree config;
+
+    /** Pouzivana kamera. */
+    Camera * camera;
 
     /**
      * Soukromy konstruktor - singleton.

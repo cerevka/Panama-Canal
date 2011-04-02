@@ -15,10 +15,6 @@
 
 using namespace std;
 
-#define TITLE "Panama Canal"
-#define WIDTH 500
-#define HEIGHT 500
-
 /**
  * Vstupni bod programu.
  * @param argc Pocet argumentu.

@@ -5,6 +5,7 @@
                    displayName="Header Files"
                    projectFiles="true"
                    kind="SOURCE_LOGICAL_FOLDER">
+      <itemPath>/media/data/Documents/CTU/6/pgr/PanamaCanal/Camera.h</itemPath>
       <itemPath>/media/data/Documents/CTU/6/pgr/PanamaCanal/Enviroment.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
@@ -16,6 +17,7 @@
                    displayName="Source Files"
                    projectFiles="true"
                    kind="SOURCE_LOGICAL_FOLDER">
+      <itemPath>/media/data/Documents/CTU/6/pgr/PanamaCanal/Camera.cpp</itemPath>
       <itemPath>/media/data/Documents/CTU/6/pgr/PanamaCanal/Enviroment.cpp</itemPath>
       <itemPath>main.cpp</itemPath>
     </logicalFolder>

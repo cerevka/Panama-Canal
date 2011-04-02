@@ -3,7 +3,10 @@
 Enviroment * Enviroment::instance = NULL;
 
 Enviroment::Enviroment(void) {
-    // Nacte konfiguraci.
+    // Vytvori kameru.
+    camera = new Camera();
+
+    // Nacte konfiguraci do prostredi a do kamery.
     loadConfig("config.xml");
 
     // Ulozi si ukazatel na sebe sama.
@@ -11,6 +14,7 @@ Enviroment::Enviroment(void) {
 }
 
 Enviroment::~Enviroment(void) {
+    delete camera;
 }
 
 Enviroment * Enviroment::getInstance(void) {
@@ -40,6 +44,10 @@ void Enviroment::display(void) {
     glVertex3d(5.0, 0.0, 5.0);
     glVertex3d(5.0, 0.0, -5.0);
     glEnd();
+
+
+
+
     glEnable(GL_LIGHTING);
 
     glPopMatrix();
@@ -78,27 +86,39 @@ void Enviroment::specialKeyboard(int key, int x, int y) {
 
     switch (key) {
         case GLUT_KEY_RIGHT:
-        { // rotate camera to the left            
+        {
+            // Kamera se natoci doleva.
+            Enviroment::getInstance()->camera->turnLeft();
             break;
         }
         case GLUT_KEY_LEFT:
-        { // rotate camera to the right            
+        {
+            // Kamera se natoci doprava.
+            Enviroment::getInstance()->camera->turnRight();
             break;
         }
         case GLUT_KEY_UP:
-        { // move camera forward
+        {
+            // Kamera se posune dopredu.
+            Enviroment::getInstance()->camera->stepForward();
             break;
         }
         case GLUT_KEY_DOWN:
-        { // move camera backward            
+        {
+            // Kamera se posune dozadu.
+            Enviroment::getInstance()->camera->stepBackward();
             break;
         }
         case GLUT_KEY_PAGE_UP:
-        { // rotate camera view direction up
+        {
+            // Kamera zvedne pohled.
+            Enviroment::getInstance()->camera->turnUp();
             break;
         }
         case GLUT_KEY_PAGE_DOWN:
-        { // rotate camera view direction up
+        {
+            // Kamera skloni pohled.
+            Enviroment::getInstance()->camera->turnDown();
             break;
         }
         default:
@@ -108,8 +128,6 @@ void Enviroment::specialKeyboard(int key, int x, int y) {
 }
 
 void Enviroment::idle(void) {
-
-
     /* Generate event to redraw the window. */
     glutPostRedisplay();
 }
@@ -139,12 +157,8 @@ void Enviroment::init(void) {
 }
 
 void Enviroment::drawScene(void) {
-    // Nastavni pozici a orientaci kamery.
-    gluLookAt(
-            0.0, 2.0, 8.0, // eye = position
-            0.0, 0.0, 0.0, // center = point onto which we are looking (view direction = eye-center)
-            0.0, 1.0, 0.0 // up vector (camera orientation along the view direction)
-            );
+    // Nastavi pozici a orientaci kamery.
+    Enviroment::getInstance()->camera->look();
 
     glPushMatrix();
 
@@ -162,9 +176,36 @@ void Enviroment::loadConfig(const string& file) {
     // Nacte se XML soubor.
     try {
         read_xml(file, config);
+
+        // Nastavi se promenne prostredi.
         windowWidth = config.get<int>("config.window.width");
         windowHeight = config.get<int>("config.window.height");
         windowTitle = config.get<string > ("config.window.title");
+
+        // Nastavi se promenne kamere.
+        camera->setPosition(
+                config.get<float>("config.camera.position.x"),
+                config.get<float>("config.camera.position.y"),
+                config.get<float>("config.camera.position.z")
+                );
+        camera->setViewDirection(
+                config.get<float>("config.camera.direction.x"),
+                config.get<float>("config.camera.direction.y"),
+                config.get<float>("config.camera.direction.z")
+                );
+        camera->setUpvector(
+                config.get<float>("config.camera.upvector.x"),
+                config.get<float>("config.camera.upvector.y"),
+                config.get<float>("config.camera.upvector.z")
+                );
+        camera->setMotionDirection(
+                config.get<float>("config.camera.motion.x"),
+                config.get<float>("config.camera.motion.y"),
+                config.get<float>("config.camera.motion.z")
+                );
+        camera->step = config.get<float>("config.camera.motion.step");
+        camera->angle = config.get<float>("config.camera.motion.angle");
+
     } catch (xml_parser_error) {
         cerr << "Enviroment::loadConfig -> XML Parser Error." << endl;
     } catch (ptree_bad_path) {
