@@ -7,14 +7,20 @@
 #include <GL/freeglut.h>
 
 #include <iostream>
+#include <string>
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include "Camera.h"
 
 using namespace std;
+using namespace boost;
 using namespace boost::property_tree;
+
+
+#define CAMERA_COUNT 3
 
 /**
  * Trida starajici se o prostredi OpenGL. Singleton.
@@ -60,7 +66,7 @@ public:
      * @param int width Sirka okna.
      * @param int height Vyska okna.
      */
-    static void reshape(int width, int height);
+    static void reshape(int _width, int _height);
 
     /**
      * Odchytava stisky klavesy.
@@ -68,7 +74,7 @@ public:
      * @param int x Xova souradnice mysi.
      * @param int y Yova souradnice mysi.
      */
-    static void keyboard(unsigned char key, int x, int y);
+    static void keyboard(unsigned char _key, int _x, int _y);
 
     /**
      * Odchytava stisky specialnich klaves.
@@ -76,7 +82,7 @@ public:
      * @param int x Xova souradnice mysi.
      * @param int y Yova souradnice mysi.
      */
-    static void specialKeyboard(int key, int x, int y);
+    static void specialKeyboard(int _key, int _x, int _y);
 
     /**
      * Odchytava klikani mysi.
@@ -85,14 +91,14 @@ public:
      * @param int x Xova souradnice.
      * @param int y Yova souradnice.
      */
-    static void mouse(int button, int state, int x, int y);
+    static void mouse(int _button, int _state, int _x, int _y);
 
     /**
      * Odchytava pohyb mysi.
      * @param int x Xova souradnice.
      * @param int y Yova souradnice.
      */
-    static void mouseMotion(int x, int y);
+    static void mouseMotion(int _x, int _y);
 
     /**
      * Vola se, pokud se zrovna nic jineho nedeje.
@@ -103,7 +109,7 @@ public:
      * Ovlada kontextova menu.
      * @param int selectedItem ID zvolene polozky.s
      */
-    static void menu(int selectedItem);
+    static void menu(int _selectedItem);
 
     /**
      * Inicializuje OpenGL.
@@ -111,9 +117,20 @@ public:
     void init(void);
 
     /**
+     * Vytvori menu.
+     */
+    void createMenu(void);
+
+    /**
      * Kresli scenu.
      */
-    void drawScene(void);   
+    void drawScene(void);
+
+    /**
+     * Vykresli osy x, y, z.
+     * @param float _length Delka os.
+     */
+    void drawAxes(float _length);
 
 private:
 
@@ -124,7 +141,10 @@ private:
     ptree config;
 
     /** Pouzivana kamera. */
-    Camera * camera;
+    Camera* camera;
+
+    /** Kamery k dispozici. */
+    Camera* cameras[CAMERA_COUNT];
 
     bool mouseLeftPressed;
 
@@ -139,7 +159,7 @@ private:
      * Nacte nastaveni z daneho souboru.
      * @param file
      */
-    void loadConfig(const string &file);
+    void loadConfig(const string& _file);
 
 };
 

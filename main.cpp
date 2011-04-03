@@ -40,22 +40,13 @@ int main(int argc, char** argv) {
     glutMouseFunc(Enviroment::mouse);
     glutMotionFunc(Enviroment::mouseMotion);
     //glutIdleFunc(Enviroment::idle);
-
-    // Vytvoreni hlavniho menu.
-    glutCreateMenu(Enviroment::menu);
-    glutAddMenuEntry("Task 1 - Circular motion of car", 1);
-    glutAddMenuEntry("Task 2 - Circular motion of camera", 2);
-    glutAddMenuEntry("Task 3 - Free motion in xz-plane (WALK mode)", 3);
-    glutAddMenuEntry("Bonus - WALK mode + up/down", 4);
-    glutAddMenuEntry("Quit", 5);
-
-    // Menu se bude otevirat pravym mysitkem.
-    glutAttachMenu(GLUT_RIGHT_BUTTON);
     
-    enviroment->init(); 
+    enviroment->createMenu();
+
+    enviroment->init();
 
     // Spusti hlavni smysku.
-    glutMainLoop();   
+    glutMainLoop();
 
     delete enviroment;
 

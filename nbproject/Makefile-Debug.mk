@@ -34,8 +34,9 @@ OBJECTDIR=build/${CND_CONF}/${CND_PLATFORM}
 # Object Files
 OBJECTFILES= \
 	${OBJECTDIR}/main.o \
+	${OBJECTDIR}/_ext/1128534263/Enviroment.o \
 	${OBJECTDIR}/_ext/1128534263/Camera.o \
-	${OBJECTDIR}/_ext/1128534263/Enviroment.o
+	${OBJECTDIR}/_ext/1128534263/Light.o
 
 
 # C Compiler Flags
@@ -67,15 +68,20 @@ ${OBJECTDIR}/main.o: main.cpp
 	${RM} $@.d
 	$(COMPILE.cc) -g -MMD -MP -MF $@.d -o ${OBJECTDIR}/main.o main.cpp
 
+${OBJECTDIR}/_ext/1128534263/Enviroment.o: /media/data/Documents/CTU/6/pgr/PanamaCanal/Enviroment.cpp 
+	${MKDIR} -p ${OBJECTDIR}/_ext/1128534263
+	${RM} $@.d
+	$(COMPILE.cc) -g -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/1128534263/Enviroment.o /media/data/Documents/CTU/6/pgr/PanamaCanal/Enviroment.cpp
+
 ${OBJECTDIR}/_ext/1128534263/Camera.o: /media/data/Documents/CTU/6/pgr/PanamaCanal/Camera.cpp 
 	${MKDIR} -p ${OBJECTDIR}/_ext/1128534263
 	${RM} $@.d
 	$(COMPILE.cc) -g -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/1128534263/Camera.o /media/data/Documents/CTU/6/pgr/PanamaCanal/Camera.cpp
 
-${OBJECTDIR}/_ext/1128534263/Enviroment.o: /media/data/Documents/CTU/6/pgr/PanamaCanal/Enviroment.cpp 
+${OBJECTDIR}/_ext/1128534263/Light.o: /media/data/Documents/CTU/6/pgr/PanamaCanal/Light.cpp 
 	${MKDIR} -p ${OBJECTDIR}/_ext/1128534263
 	${RM} $@.d
-	$(COMPILE.cc) -g -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/1128534263/Enviroment.o /media/data/Documents/CTU/6/pgr/PanamaCanal/Enviroment.cpp
+	$(COMPILE.cc) -g -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/1128534263/Light.o /media/data/Documents/CTU/6/pgr/PanamaCanal/Light.cpp
 
 # Subprojects
 .build-subprojects:

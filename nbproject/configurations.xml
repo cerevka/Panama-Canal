@@ -7,6 +7,7 @@
                    kind="SOURCE_LOGICAL_FOLDER">
       <itemPath>/media/data/Documents/CTU/6/pgr/PanamaCanal/Camera.h</itemPath>
       <itemPath>/media/data/Documents/CTU/6/pgr/PanamaCanal/Enviroment.h</itemPath>
+      <itemPath>/media/data/Documents/CTU/6/pgr/PanamaCanal/Light.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -19,6 +20,7 @@
                    kind="SOURCE_LOGICAL_FOLDER">
       <itemPath>/media/data/Documents/CTU/6/pgr/PanamaCanal/Camera.cpp</itemPath>
       <itemPath>/media/data/Documents/CTU/6/pgr/PanamaCanal/Enviroment.cpp</itemPath>
+      <itemPath>/media/data/Documents/CTU/6/pgr/PanamaCanal/Light.cpp</itemPath>
       <itemPath>main.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"

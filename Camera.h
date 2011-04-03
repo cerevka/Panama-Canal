@@ -4,6 +4,14 @@
 #include <GL/gl.h>
 #include <GL/freeglut.h>
 
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
+
+#include <string>
+
+using namespace std;
+using namespace boost::property_tree;
+
 class Camera {
 public:
     /** Velikost kroku kamery. */
@@ -24,7 +32,7 @@ public:
     /**
      * Vytvori novou kameru.
      */
-    Camera(void);
+    Camera(const ptree* _config, const string& _name);
 
     /**
      * Znici kameru.
@@ -37,7 +45,7 @@ public:
      * @param GLfloat y Yova souradnice.
      * @param GLfloat z Zova souradnice.
      */
-    void setPosition(GLfloat x, GLfloat y, GLfloat z);
+    void setPosition(GLfloat _x, GLfloat _y, GLfloat _z);
 
     /**
      * Nastavi smer kamery.
@@ -45,7 +53,7 @@ public:
      * @param GLfloat y Yova souradnice.
      * @param GLfloat z Zova souradnice.
      */
-    void setViewDirection(GLfloat x, GLfloat y, GLfloat z);
+    void setViewDirection(GLfloat _x, GLfloat _y, GLfloat _z);
 
     /**
      * Nastavi upvector kamery.
@@ -53,7 +61,7 @@ public:
      * @param GLfloat y Yova souradnice.
      * @param GLfloat z Zova souradnice.
      */
-    void setUpvector(GLfloat x, GLfloat y, GLfloat z);
+    void setUpvector(GLfloat _x, GLfloat _y, GLfloat _z);
 
     /**
      * Nastavni souradnice smeru pohybu.
@@ -61,7 +69,7 @@ public:
      * @param GLfloat y Yova souradnice.
      * @param GLfloat z Zova souradnice.
      */
-    void setMotionDirection(GLfloat x, GLfloat y, GLfloat z);
+    void setMotionDirection(GLfloat _x, GLfloat _y, GLfloat _z);
 
     /**
      * Umisti kameru.
@@ -110,6 +118,8 @@ private:
 
     /** Smer pohybu kamery. */
     GLfloat motionDirection[3];
+
+    void loadConfig(const ptree* _config, const string& _name);
 };
 
 #endif	/* CAMERA_H */
