@@ -8,19 +8,21 @@
 
 #include <iostream>
 #include <string>
+#include <cmath>
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include "Camera.h"
+#include "Light.h"
 
 using namespace std;
 using namespace boost;
 using namespace boost::property_tree;
 
-
 #define CAMERA_COUNT 3
+#define LIGHT_COUNT 2
 
 /**
  * Trida starajici se o prostredi OpenGL. Singleton.
@@ -117,6 +119,11 @@ public:
     void init(void);
 
     /**
+     * Inicializuje svetla.
+     */
+    void initLights(void);
+
+    /**
      * Vytvori menu.
      */
     void createMenu(void);
@@ -146,6 +153,11 @@ private:
     /** Kamery k dispozici. */
     Camera* cameras[CAMERA_COUNT];
 
+    /** Svetla. */
+    Light* lights[LIGHT_COUNT];
+
+    float sunAngle;
+
     bool mouseLeftPressed;
 
     int lastCoordinate[2];
@@ -160,6 +172,8 @@ private:
      * @param file
      */
     void loadConfig(const string& _file);
+
+    void drawPlane(int subdiv);
 
 };
 

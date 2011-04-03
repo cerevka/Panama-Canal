@@ -6,17 +6,10 @@ Enviroment::Enviroment(void) {
     // Nacte konfiguraci do prostredi a do kamery.
     loadConfig("config.xml");
 
-    // Vytvori kamery.
-    for (int i = 0; i < CAMERA_COUNT; ++i) {
-        string name = lexical_cast<string>(i);
-        cameras[i] = new Camera(&config, name);
-    }
-
-    // Nastavi se kamera.
-    camera = cameras[0];
     // Ulozi si ukazatel na sebe sama.
     instance = this;
     mouseLeftPressed = false;
+    sunAngle = 90.0;
 }
 
 Enviroment::~Enviroment(void) {
@@ -40,18 +33,6 @@ void Enviroment::display(void) {
 
     // Zavola funkci kreslici scenu.
     Enviroment::instance->drawScene();
-
-    // Nakresli zem - zeleny obdelnik v rovine XZ.
-    glDisable(GL_LIGHTING);
-    glBegin(GL_QUADS);
-    glColor3d(0.3, 0.8, 0.3);
-    glVertex3d(-5.0, 0.0, -5.0);
-    glVertex3d(-5.0, 0.0, 5.0);
-    glVertex3d(5.0, 0.0, 5.0);
-    glVertex3d(5.0, 0.0, -5.0);
-    glEnd();
-
-    glEnable(GL_LIGHTING);
 
     glPopMatrix();
 
@@ -182,6 +163,22 @@ void Enviroment::menu(int _selectedItem) {
             break;
         case 13:
             enviroment->camera = enviroment->cameras[2];
+            break;
+        case 21:
+            // Zapinani a vypinani slunce.
+            if (enviroment->lights[0]->getState() == true) {
+                enviroment->lights[0]->switchOff();
+            } else {
+                enviroment->lights[0]->switchOn();
+            }
+            break;
+        case 22:
+            // Ovladani svetel majaku.
+            if (enviroment->lights[1]->getState() == true) {
+                enviroment->lights[1]->switchOff();
+            } else {
+                enviroment->lights[1]->switchOn();
+            }
     }
     glutPostRedisplay();
 }
@@ -191,15 +188,51 @@ void Enviroment::init(void) {
 
     // Predni strany polygonu jsou vyplneny, zadni strany maji jen obrysy.
     glPolygonMode(GL_FRONT, GL_FILL);
-    glPolygonMode(GL_BACK, GL_LINE);
+    glPolygonMode(GL_BACK, GL_FILL);
 
     // Zahazuji se zadni strany polygony.
     glCullFace(GL_BACK);
 
     // Zapnuti osvetleni.
     glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
-    glEnable(GL_NORMALIZE);
+    glShadeModel(GL_SMOOTH);
+    glEnable(GL_COLOR_MATERIAL);
+
+    // Vytvori kamery.
+    for (int i = 0; i < CAMERA_COUNT; ++i) {
+        try {
+            string name = lexical_cast<string > (i);
+            cameras[i] = new Camera(&config, name);
+        } catch (bad_lexical_cast exception) {
+            cerr << "Enviroment::constructor -> Bad Lexical Cast." << endl;
+        }
+    }
+    // Nastavi se aktualni kamera.
+    camera = cameras[2];
+
+    // Inicializuji se svetla.
+    initLights();
+}
+
+void Enviroment::initLights(void) {
+    // Vytvori se slunce.
+    lights[0] = new Light(0);
+    lights[0]->setPosition(1.0, 1.0, 0.0);
+    lights[0]->setAmbient(0.0, 0.0, 0.0, 1.0);
+    lights[0]->setDiffuse(1.0, 1.0, 1.0, 1.0);
+    lights[0]->setSpecular(1.0, 1.0, 1.0);
+    //lights[0]->switchOn();
+
+    // Vytvori se reflektor.
+    lights[1] = new Light(1);
+    lights[1]->setPosition(0.0, 0.0, 0.0, 1.0);
+    lights[1]->setAmbient(0.0, 0.0, 0.0, 1.0);
+    lights[1]->setDiffuse(1.0, 1.0, 1.0, 1.0);
+    lights[1]->setSpecular(0.0, 0.0, 0.0, 1.0);
+    lights[1]->setSpotCutOff(10.0);
+    lights[1]->switchOn();
+
+
 }
 
 void Enviroment::createMenu(void) {
@@ -209,9 +242,14 @@ void Enviroment::createMenu(void) {
     glutAddMenuEntry("Static view 2", 12);
     glutAddMenuEntry("Walk", 13);
 
+    int lightMenu = glutCreateMenu(Enviroment::menu);
+    glutAddMenuEntry("Switch on/off sun", 21);
+    glutAddMenuEntry("Switch on/off lighthouse", 22);
+
     // Vytvoreni hlavniho menu.
     glutCreateMenu(Enviroment::menu);
     glutAddSubMenu("Camera", cameraMenu);
+    glutAddSubMenu("Lights", lightMenu);
     glutAddMenuEntry("Quit", 0);
 
     // Menu se bude otevirat pravym mysitkem.
@@ -220,39 +258,57 @@ void Enviroment::createMenu(void) {
 
 void Enviroment::drawScene(void) {
     // Nastavi pozici a orientaci kamery.
-    Enviroment::getInstance()->camera->look();
+    camera->look();
 
-    //glPushMatrix();
+    cout << *(lights[1]);
 
-    /* Move the car model to stand on the xz plane. */
-    //glTranslated(0.0, 0.25, 0.0);
+    glPushMatrix();
+    glLoadIdentity();
+    lights[1]->setPosition(0, 0, 0, 1);
+    glPopMatrix();
 
-    /* Draw the car model. */
-    //drawModel( 0, "data/bronco.obj" );
+    // Nakresli zem - zeleny obdelnik v rovine XZ.
+    /*
+    glNormal3f(0.0, 1.0, 0.0);
 
-    //glPopMatrix();
+    glBegin(GL_QUADS);
+    
+    glVertex3d(-5.0, 0.0, -5.0);
+    glVertex3d(-5.0, 0.0, 5.0);
+    glVertex3d(5.0, 0.0, 5.0);
+    glVertex3d(5.0, 0.0, -5.0);
+    glEnd();
+     */
+    glColor3d(0.3, 0.8, 0.3);
+    drawPlane(100);
 
-    //drawCircle(R);
+    // Nakresli cajnik.
+    glPushMatrix();
+    glColor3f(1.0, 1.0, 1.0);
+    glTranslated(0.0, 0.5, 0.0);
+    glutSolidTeapot(0.5);
+    drawAxes(1.0);
+    glPopMatrix();
 }
 
 void Enviroment::drawAxes(float _length) {
     glDisable(GL_LIGHTING);
 
-    /* Draw x-axis. */
+    // Nakresli osu x.
     glColor3f(1.0, 0.0, 0.0);
     glBegin(GL_LINES);
     glVertex3f(0.0, 0.0, 0.0);
     glVertex3f(_length, 0.0, 0.0);
     glEnd();
 
-    /* Draw y-axis. */
+    // Nakresli osu y.
     glColor3f(0.0, 1.0, 0.0);
     glBegin(GL_LINES);
     glVertex3f(0.0, 0.0, 0.0);
     glVertex3f(0.0, _length, 0.0);
     glEnd();
 
-    /* Draw z-axis. */
+    // Nakresli osu z.
     glColor3f(0.0, 0.0, 1.0);
     glBegin(GL_LINES);
     glVertex3f(0.0, 0.0, 0.0);
@@ -270,12 +326,47 @@ void Enviroment::loadConfig(const string& _file) {
         // Nastavi se promenne prostredi.
         windowWidth = config.get<int>("config.window.width");
         windowHeight = config.get<int>("config.window.height");
-        windowTitle = config.get<string > ("config.window.title"); 
-    } catch (xml_parser_error) {
+        windowTitle = config.get<string > ("config.window.title");
+    } catch (xml_parser_error exception) {
         cerr << "Enviroment::loadConfig -> XML Parser Error." << endl;
-    } catch (ptree_bad_path) {
+    } catch (ptree_bad_path exception) {
         cerr << "Enviroment::loadConfig -> PTree Bad Path." << endl;
-    } catch (ptree_bad_data) {
+    } catch (ptree_bad_data exception) {
         cerr << "Enviroment::loadConfig -> PTree Bad Data." << endl;
+    }
+}
+
+/// Draws a green plane (the ground) under car as a grid.
+
+/**
+ \param[in]  subdiv		Number of splits in plain subdivision => grid resolution is subdiv x subdiv.
+ \param[in]  index		Material index (see material.inc).
+ */
+void Enviroment::drawPlane(int subdiv) {
+    const float size = 12; // plane size
+   
+    glNormal3f(0.0, 1.0, 0.0);
+
+    
+    float d = size / subdiv;
+    float start = -size / 2.0;
+
+    float x = start;
+    for (int i = 0; i < subdiv; i++) {
+        float z = start;
+
+        glBegin(GL_QUAD_STRIP);
+
+        glVertex3d(x + d, 0.0, z);
+        glVertex3d(x, 0.0, z);
+
+        for (int j = 1; j < subdiv; j++) {
+            glVertex3d(x + d, 0.0, z + d);
+            glVertex3d(x, 0.0, z + d);
+            z += d;
+        }
+        x += d;
+
+        glEnd();
     }
 }

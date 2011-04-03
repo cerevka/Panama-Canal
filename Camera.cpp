@@ -134,13 +134,26 @@ void Camera::loadConfig(const ptree* _config, const string& _name) {
         step = _config->get<float>(path + "motion.step");
         rotationAngleStep = _config->get<float>(path + "motion.angle.rotation");
         elevationAngleStep = _config->get<float>(path + "motion.angle.elevation");
-    } catch (xml_parser_error) {
-        cerr << "Camera "+_name+"::loadConfig -> XML Parser Error." << endl;
-    } catch (ptree_bad_path) {
+    } catch (ptree_bad_path exception) {
         cerr << "Camera "+_name+"::loadConfig -> PTree Bad Path." << endl;
-    } catch (ptree_bad_data) {
+    } catch (ptree_bad_data exception) {
         cerr << "Camera "+_name+"::loadConfig -> PTree Bad Data." << endl;
     }
+}
+
+ostream& operator<<(ostream& os, Camera& camera) {
+    os << "Camera" << endl;
+    os << "- position(" << camera.position[0] << ", " << camera.position[1] << ", " << camera.position[2] << ")" << endl;
+    os << "- viewDirection(" << camera.viewDirection[0] << ", " << camera.viewDirection[1] << ", " << camera.viewDirection[2] << ")" << endl;
+    os << "- upvector(" << camera.upvector[0] << ", " << camera.upvector[1] << ", " << camera.upvector[2] << ")" << endl;
+    os << "- motionDirection(" << camera.motionDirection[0] << ", " << camera.motionDirection[1] << ", " << camera.motionDirection[2] << ")" << endl;
+    os << "- step(" << camera.step << ")" << endl;
+    os << "- rotationAngleStep(" << camera.rotationAngleStep << ")" << endl;
+    os << "- elevationAngleStep(" << camera.elevationAngleStep << ")" << endl;
+    os << "- rotationAngle(" << camera.rotationAngle << ")" << endl;
+    os << "- elevationAngle(" << camera.elevationAngle << ")" << endl;
+    os << endl;
+    return os;
 }
 
 

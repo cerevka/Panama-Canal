@@ -106,6 +106,8 @@ public:
      */
     void stepBackward(void);
 
+    friend ostream& operator<<(ostream& os, Camera& camera);
+
 private:
     /** Pozice x, y, z kamery. */
     GLfloat position[3];
