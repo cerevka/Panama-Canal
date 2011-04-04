@@ -39,7 +39,7 @@ int main(int argc, char** argv) {
     glutSpecialFunc(Enviroment::specialKeyboard);
     glutMouseFunc(Enviroment::mouse);
     glutMotionFunc(Enviroment::mouseMotion);
-    //glutIdleFunc(Enviroment::idle);
+    glutIdleFunc(Enviroment::idle);
     
     enviroment->createMenu();
 

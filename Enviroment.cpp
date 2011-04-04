@@ -10,6 +10,8 @@ Enviroment::Enviroment(void) {
     instance = this;
     mouseLeftPressed = false;
     sunAngle = 90.0;
+    dynamicView = false;
+    dynamicViewAngle = 0.0;
 }
 
 Enviroment::~Enviroment(void) {
@@ -29,11 +31,9 @@ void Enviroment::display(void) {
 
     // Zacatek kresleni sceny.
     glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
 
-    // Zavola funkci kreslici scenu.
+    glPushMatrix();   
     Enviroment::instance->drawScene();
-
     glPopMatrix();
 
     // Konec kresleni sceny.
@@ -145,8 +145,16 @@ void Enviroment::mouseMotion(int _x, int _y) {
 }
 
 void Enviroment::idle(void) {
-    /* Generate event to redraw the window. */
-    glutPostRedisplay();
+    Enviroment* enviroment = Enviroment::instance;
+    if (enviroment->dynamicView == true) {
+        enviroment->dynamicViewAngle += 0.3;
+        GLfloat* position = enviroment->camera->getPosition();
+        enviroment->camera->setPosition(cos(enviroment->dynamicViewAngle * DEG_TO_RAD) * 5, 0.5, sin(enviroment->dynamicViewAngle * DEG_TO_RAD) * 5);
+        enviroment->camera->setViewDirection(1.0, 0.0, 1.0);
+    }
+
+    // Prekresluje.
+    //glutPostRedisplay();
 }
 
 void Enviroment::menu(int _selectedItem) {
@@ -156,13 +164,22 @@ void Enviroment::menu(int _selectedItem) {
             exit(0);
             break;
         case 11:
-            enviroment->camera = enviroment->cameras[0];
+            // Staticky pohled 1.
+            enviroment->camera = enviroment->cameras[0];           
             break;
         case 12:
-            enviroment->camera = enviroment->cameras[1];
+            // Staticky pohled 2.
+            enviroment->camera = enviroment->cameras[1];            
             break;
         case 13:
-            enviroment->camera = enviroment->cameras[2];
+            // Dynamicky pohled.
+            enviroment->camera = enviroment->cameras[2];            
+            enviroment->dynamicView = true;
+            break;
+        case 14:
+            // Pohybliva kamera.
+            enviroment->cameras[3]->loadConfig(enviroment->camera);
+            enviroment->camera = enviroment->cameras[3];            
             break;
         case 21:
             // Zapinani a vypinani slunce.
@@ -173,7 +190,7 @@ void Enviroment::menu(int _selectedItem) {
             }
             break;
         case 22:
-            // Ovladani svetel majaku.
+            // Ovladani baterky.
             if (enviroment->lights[1]->getState() == true) {
                 enviroment->lights[1]->switchOff();
             } else {
@@ -193,46 +210,26 @@ void Enviroment::init(void) {
     // Zahazuji se zadni strany polygony.
     glCullFace(GL_BACK);
 
-    // Zapnuti osvetleni.
-    glEnable(GL_LIGHTING);
-    glShadeModel(GL_SMOOTH);
-    glEnable(GL_COLOR_MATERIAL);
-
     // Vytvori kamery.
     for (int i = 0; i < CAMERA_COUNT; ++i) {
         try {
             string name = lexical_cast<string > (i);
-            cameras[i] = new Camera(&config, name);
+            cameras[i] = new Camera(name, config);
         } catch (bad_lexical_cast exception) {
             cerr << "Enviroment::constructor -> Bad Lexical Cast." << endl;
+            exit(1);
         }
     }
     // Nastavi se aktualni kamera.
     camera = cameras[2];
 
-    // Inicializuji se svetla.
-    initLights();
-}
-
-void Enviroment::initLights(void) {
-    // Vytvori se slunce.
-    lights[0] = new Light(0);
-    lights[0]->setPosition(1.0, 1.0, 0.0);
-    lights[0]->setAmbient(0.0, 0.0, 0.0, 1.0);
-    lights[0]->setDiffuse(1.0, 1.0, 1.0, 1.0);
-    lights[0]->setSpecular(1.0, 1.0, 1.0);
-    //lights[0]->switchOn();
-
-    // Vytvori se reflektor.
-    lights[1] = new Light(1);
-    lights[1]->setPosition(0.0, 0.0, 0.0, 1.0);
-    lights[1]->setAmbient(0.0, 0.0, 0.0, 1.0);
-    lights[1]->setDiffuse(1.0, 1.0, 1.0, 1.0);
-    lights[1]->setSpecular(0.0, 0.0, 0.0, 1.0);
-    lights[1]->setSpotCutOff(10.0);
-    lights[1]->switchOn();
-
-
+    // Zapnuti osvetleni.
+    glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
+    glEnable(GL_LIGHTING);
+    glShadeModel(GL_SMOOTH);
+    for (int i = 0; i < LIGHT_COUNT; ++i) {
+        lights[i] = new Light(i, config);
+    }
 }
 
 void Enviroment::createMenu(void) {
@@ -240,11 +237,12 @@ void Enviroment::createMenu(void) {
     int cameraMenu = glutCreateMenu(Enviroment::menu);
     glutAddMenuEntry("Static view 1", 11);
     glutAddMenuEntry("Static view 2", 12);
-    glutAddMenuEntry("Walk", 13);
+    glutAddMenuEntry("Dynamic view", 13);
+    glutAddMenuEntry("Walk", 14);
 
     int lightMenu = glutCreateMenu(Enviroment::menu);
     glutAddMenuEntry("Switch on/off sun", 21);
-    glutAddMenuEntry("Switch on/off lighthouse", 22);
+    glutAddMenuEntry("Switch on/off flashlight", 22);
 
     // Vytvoreni hlavniho menu.
     glutCreateMenu(Enviroment::menu);
@@ -258,34 +256,37 @@ void Enviroment::createMenu(void) {
 
 void Enviroment::drawScene(void) {
     // Nastavi pozici a orientaci kamery.
-    camera->look();
-
-    cout << *(lights[1]);
-
-    glPushMatrix();
     glLoadIdentity();
-    lights[1]->setPosition(0, 0, 0, 1);
+    Enviroment::instance->camera->look();
+
+    // Repozicuji se staticka svetla.
+    for (int i = 0; i < LIGHT_COUNT; ++i) {
+        if (lights[i]->dynamic == false) {
+            lights[i]->rePosition();
+            lights[i]->reSpotDirection();
+        }
+    }
+
+    
+
+    cout << *(lights[0]);
+
+    // Nakresli se podklad.
+    glPushMatrix();    
+    drawPlane(100);
     glPopMatrix();
 
-    // Nakresli zem - zeleny obdelnik v rovine XZ.
-    /*
-    glNormal3f(0.0, 1.0, 0.0);
-
-    glBegin(GL_QUADS);
-    
-    glVertex3d(-5.0, 0.0, -5.0);
-    glVertex3d(-5.0, 0.0, 5.0);
-    glVertex3d(5.0, 0.0, 5.0);
-    glVertex3d(5.0, 0.0, -5.0);
-    glEnd();
-     */
-    glColor3d(0.3, 0.8, 0.3);
-    drawPlane(100);
-
     // Nakresli cajnik.
-    glPushMatrix();
-    glColor3f(1.0, 1.0, 1.0);
+    glPushMatrix();    
     glTranslated(0.0, 0.5, 0.0);
+    GLfloat ambient[] = {0.4, 0.4, 0.4, 1.0f};
+    glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
+    GLfloat diffuse[] = {0.8, 0.8, 0.8, 1.0};
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
+    GLfloat specular[] = {1.0, 1.0, 1.0, 1.0};
+    glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
+    glMaterialf(GL_FRONT, GL_SHININESS, 100.0);
+
     glutSolidTeapot(0.5);
     drawAxes(1.0);
     glPopMatrix();
@@ -329,25 +330,33 @@ void Enviroment::loadConfig(const string& _file) {
         windowTitle = config.get<string > ("config.window.title");
     } catch (xml_parser_error exception) {
         cerr << "Enviroment::loadConfig -> XML Parser Error." << endl;
+        exit(1);
     } catch (ptree_bad_path exception) {
         cerr << "Enviroment::loadConfig -> PTree Bad Path." << endl;
+        exit(1);
     } catch (ptree_bad_data exception) {
         cerr << "Enviroment::loadConfig -> PTree Bad Data." << endl;
+        exit(1);
     }
 }
 
-/// Draws a green plane (the ground) under car as a grid.
-
 /**
- \param[in]  subdiv		Number of splits in plain subdivision => grid resolution is subdiv x subdiv.
- \param[in]  index		Material index (see material.inc).
+ * Vykresli zeleny podklad jako mrizku.
+ * @param subdiv Pocet casti.
  */
 void Enviroment::drawPlane(int subdiv) {
     const float size = 12; // plane size
-   
+
     glNormal3f(0.0, 1.0, 0.0);
 
-    
+    GLfloat ambient[] = {0.02f, 0.52f, 0.02f, 1.0f};
+    glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
+    GLfloat diffuse[] = {0.01f, 0.51f, 0.01f, 1.0f};
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
+    GLfloat specular[] = {0.40f, 0.40f, 0.40f, 1.0f};
+    glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
+    glMaterialf(GL_FRONT, GL_SHININESS, 10.f);
+
     float d = size / subdiv;
     float start = -size / 2.0;
 

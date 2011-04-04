@@ -5,18 +5,24 @@
 
 #include <boost/lexical_cast.hpp>
 
+#include <boost/property_tree/ptree.hpp>
+
 #include <string>
 #include <iostream>
 
 using namespace std;
 using namespace boost;
+using namespace boost::property_tree;
 
 class Light {
 public:
+    /** Indikace pohybujiciho se svetla. */
+    bool dynamic;
+
     /**
      * Vytvori nove svetlo.
      */
-    Light(int _number);
+    Light(int _number, ptree& _config);
 
     /**
      * Zdestruuje svetlo.
@@ -70,12 +76,22 @@ public:
     void setPosition(GLfloat _x, GLfloat _y, GLfloat _z, GLfloat _w = 0.0);
 
     /**
+     * Znovu umisti svetlo (kvuli transformacim).
+     */
+    void rePosition(void);
+
+    /**
      * Nastavi smer bodoveho svetla.
      * @param GLfloat _x Xova souradnice.
      * @param GLfloat _y Yova souradnice.
      * @param GLfloat _z Zova souradnice.
      */
     void setSpotDirection(GLfloat _x, GLfloat _y, GLfloat _z);
+
+    /**
+     * Znovu nasmeruje svetlo (kvuli transformacim).
+     */
+    void reSpotDirection(void);
 
     /**
      * Nastaveni exponent bodoveho svetla.
@@ -103,7 +119,7 @@ public:
      */
     bool getState(void);
 
-    friend ostream& operator<<(ostream& os, Light& light);
+    friend ostream & operator<<(ostream& os, Light& light);
 
 private:
 
@@ -143,6 +159,8 @@ private:
 
     /** Indikace zapnuti/vypnuti. */
     bool state;
+
+    void loadConfig(const string& _name, ptree& _config);
 };
 
 #endif	/* LIGHT_H */

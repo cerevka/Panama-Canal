@@ -3,11 +3,8 @@
 #include "Camera.h"
 #include "Enviroment.h"
 
-Camera::Camera(const ptree* _config, const string& _name) {
-    rotationAngle = 0.0;
-    elevationAngle = 0.0;
-
-    loadConfig(_config, _name);
+Camera::Camera(const string& _name, ptree& _config) {
+    loadConfig(_name, _config);
 }
 
 Camera::~Camera() {
@@ -17,6 +14,10 @@ void Camera::setPosition(GLfloat _x, GLfloat _y, GLfloat _z) {
     position[0] = _x;
     position[1] = _y;
     position[2] = _z;
+}
+
+GLfloat* Camera::getPosition(void) {
+    return position;
 }
 
 void Camera::setViewDirection(GLfloat _x, GLfloat _y, GLfloat _z) {
@@ -39,6 +40,7 @@ void Camera::setMotionDirection(GLfloat _x, GLfloat _y, GLfloat _z) {
 
 void Camera::look(void) {
 
+
     // Spocte smerove souradnice.
     setViewDirection(
             cos(rotationAngle * DEG_TO_RAD) * cos(elevationAngle * DEG_TO_RAD),
@@ -59,6 +61,7 @@ void Camera::look(void) {
             cos(elevationAngle * DEG_TO_RAD),
             -sin(rotationAngle * DEG_TO_RAD) * sin(elevationAngle * DEG_TO_RAD)
             );
+
 
     gluLookAt(
             position[0], position[1], position[2], // pozice kamery
@@ -107,41 +110,49 @@ void Camera::stepBackward(void) {
     position[2] -= step * motionDirection[2];
 }
 
-void Camera::loadConfig(const ptree* _config, const string& _name) {
+void Camera::loadConfig(const Camera* camera) {
+    setPosition(camera->position[0], camera->position[1], camera->position[2]);
+    setViewDirection(camera->viewDirection[0], camera->viewDirection[1], camera->viewDirection[2]);
+    setUpvector(camera->upvector[0], camera->upvector[1], camera->upvector[2]);
+    setMotionDirection(camera->motionDirection[0], camera->motionDirection[1], camera->motionDirection[2]);
+    rotationAngle = camera->rotationAngle;
+    elevationAngle = camera->elevationAngle;
+}
+
+void Camera::loadConfig(const string& _name, ptree& _config) {
     string path = "config.cameras.camera-" + _name + ".";
     try {
         // Nastavi se promenne kamere.
         setPosition(
-                _config->get<float>(path + "position.x"),
-                _config->get<float>(path + "position.y"),
-                _config->get<float>(path + "position.z")
+                _config.get<float>(path + "position.x"),
+                _config.get<float>(path + "position.y"),
+                _config.get<float>(path + "position.z")
                 );
         setViewDirection(
-                _config->get<float>(path + "direction.x"),
-                _config->get<float>(path + "direction.y"),
-                _config->get<float>(path + "direction.z")
+                _config.get<float>(path + "direction.x"),
+                _config.get<float>(path + "direction.y"),
+                _config.get<float>(path + "direction.z")
                 );
         setUpvector(
-                _config->get<float>(path + "upvector.x"),
-                _config->get<float>(path + "upvector.y"),
-                _config->get<float>(path + "upvector.z")
+                _config.get<float>(path + "upvector.x"),
+                _config.get<float>(path + "upvector.y"),
+                _config.get<float>(path + "upvector.z")
                 );
-        setMotionDirection(
-                _config->get<float>(path + "motion.x"),
-                _config->get<float>(path + "motion.y"),
-                _config->get<float>(path + "motion.z")
-                );
-        step = _config->get<float>(path + "motion.step");
-        rotationAngleStep = _config->get<float>(path + "motion.angle.rotation");
-        elevationAngleStep = _config->get<float>(path + "motion.angle.elevation");
+        step = _config.get<float>(path + "motion.step");
+        rotationAngleStep = _config.get<float>(path + "motion.angle.rotation-step");
+        elevationAngleStep = _config.get<float>(path + "motion.angle.elevation-step");
+        rotationAngle = _config.get<float>(path + "rotation");
+        elevationAngle = _config.get<float>(path + "elevation");
     } catch (ptree_bad_path exception) {
-        cerr << "Camera "+_name+"::loadConfig -> PTree Bad Path." << endl;
+        cerr << "Camera " + _name + "::loadConfig -> PTree Bad Path." << endl;
+        exit(1);
     } catch (ptree_bad_data exception) {
-        cerr << "Camera "+_name+"::loadConfig -> PTree Bad Data." << endl;
+        cerr << "Camera " + _name + "::loadConfig -> PTree Bad Data." << endl;
+        exit(1);
     }
 }
 
-ostream& operator<<(ostream& os, Camera& camera) {
+ostream & operator<<(ostream& os, Camera& camera) {
     os << "Camera" << endl;
     os << "- position(" << camera.position[0] << ", " << camera.position[1] << ", " << camera.position[2] << ")" << endl;
     os << "- viewDirection(" << camera.viewDirection[0] << ", " << camera.viewDirection[1] << ", " << camera.viewDirection[2] << ")" << endl;

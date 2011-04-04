@@ -1,6 +1,6 @@
 #include "Light.h"
 
-Light::Light(int _number) {
+Light::Light(int _number, ptree& _config) {
     id = _number;
     switch (_number) {
         case 0:
@@ -28,18 +28,13 @@ Light::Light(int _number) {
             name = GL_LIGHT7;
             break;
     }
-
-    // Vychozi nastaveni svetla.
-    /*
-    setAmbient(0.0, 0.0, 0.0);
-    setDiffuse(1.0, 1.0, 1.0);
-    setSpecular(1.0, 1.0, 1.0);
-    setPosition(0.0, 0.0, 1.0);
-    setSpotDirection(0.0, 0.0, -1.0);
-    setSpotExponent(0.0);
-    setSpotCutOff(180.0);
-    setAttenuation(1.0, 0.0, 0.0);
-     */
+    try {
+        string _name = lexical_cast<string>(_number);
+        loadConfig(_name, _config);
+    } catch (bad_lexical_cast exception) {
+        cerr << "Light " << id << "::constructor -> Lexical Cast." << endl;
+        exit(1);
+    }
 }
 
 Light::~Light(void) {
@@ -47,11 +42,13 @@ Light::~Light(void) {
 
 void Light::switchOn(void) {
     glEnable(name);
+    cout << "rozsviceno";
     state = true;
 }
 
 void Light::switchOff(void) {
     glDisable(name);
+    cout << "zhasnuto";
     state = false;
 }
 
@@ -87,10 +84,18 @@ void Light::setPosition(GLfloat _x, GLfloat _y, GLfloat _z, GLfloat _w) {
     glLightfv(name, GL_POSITION, position);
 }
 
+void Light::rePosition(void) {
+    glLightfv(name, GL_POSITION, position);
+}
+
 void Light::setSpotDirection(GLfloat _x, GLfloat _y, GLfloat _z) {
     spotDirection[0] = _x;
     spotDirection[1] = _y;
     spotDirection[2] = _z;
+    glLightfv(name, GL_SPOT_DIRECTION, spotDirection);
+}
+
+void Light::reSpotDirection(void) {
     glLightfv(name, GL_SPOT_DIRECTION, spotDirection);
 }
 
@@ -118,16 +123,73 @@ bool Light::getState(void) {
     return state;
 }
 
-ostream& operator<<(ostream& os, Light& light) {
-    os << "Light " << light.id <<  endl;
-    os << "- ambient(" << light.ambient[0] << ", "<< light.ambient[1] << ", " << light.ambient[2] << ", " << light.ambient[3] << ")" << endl;
-    os << "- diffuse(" << light.diffuse[0] << ", "<< light.diffuse[1] << ", " << light.diffuse[2] << ", " << light.diffuse[3] << ")" << endl;
-    os << "- specular(" << light.specular[0] << ", "<< light.specular[1] << ", " << light.specular[2] << ", " << light.specular[3] << ")" << endl;
-    os << "- position(" << light.position[0] << ", "<< light.position[1] << ", " << light.position[2] << ", " << light.position[3] << ")" << endl;
-    os << "- spotDirection(" << light.spotDirection[0] << ", "<< light.spotDirection[1] << ", " << light.spotDirection[2] << ", " << light.spotDirection[3] << ")" << endl;
+void Light::loadConfig(const string& _name, ptree& _config) {
+    string path = "config.lights.light-" + _name + ".";    
+    try {
+        // Nastavi se promenne svetlu.
+        dynamic = _config.get<bool>(path + "dynamic");
+        state = _config.get<bool>(path + "state");
+        if (state == true) {
+            switchOn();
+        } else {
+            switchOff();
+        }
+        setAmbient(
+                _config.get<float>(path + "ambient.r"),
+                _config.get<float>(path + "ambient.g"),
+                _config.get<float>(path + "ambient.b"),
+                _config.get<float>(path + "ambient.a")
+                );
+        setDiffuse(
+                _config.get<float>(path + "diffuse.r"),
+                _config.get<float>(path + "diffuse.g"),
+                _config.get<float>(path + "diffuse.b"),
+                _config.get<float>(path + "diffuse.a")
+                );
+        setSpecular(
+                _config.get<float>(path + "specular.r"),
+                _config.get<float>(path + "specular.g"),
+                _config.get<float>(path + "specular.b"),
+                _config.get<float>(path + "specular.a")
+                );
+        setPosition(
+                _config.get<float>(path + "position.x"),
+                _config.get<float>(path + "position.y"),
+                _config.get<float>(path + "position.z"),
+                _config.get<float>(path + "position.w")
+                );
+        setSpotDirection(
+                _config.get<float>(path + "spot-direction.x"),
+                _config.get<float>(path + "spot-direction.y"),
+                _config.get<float>(path + "spot-direction.z")
+                );
+        setSpotExponent(_config.get<float>(path + "spot-exponent"));
+        setSpotCutOff(_config.get<float>(path + "spot-cutoff"));
+        setAttenuation(
+                _config.get<float>(path + "attenuation.constant"),
+                _config.get<float>(path + "attenuation.linear"),
+                _config.get<float>(path + "attenuation.quadratic")
+                );
+    } catch (ptree_bad_path exception) {
+        cerr << "Light " + _name + "::loadConfig -> PTree Bad Path." << endl << exception.what() << endl;
+        exit(1);
+    } catch (ptree_bad_data exception) {
+        cerr << "Light " + _name + "::loadConfig -> PTree Bad Data." << endl << exception.what() << endl;
+        exit(1);
+    }
+}
+
+ostream & operator<<(ostream& os, Light& light) {
+    os << "Light " << light.id << endl;
+    os << "- ambient(" << light.ambient[0] << ", " << light.ambient[1] << ", " << light.ambient[2] << ", " << light.ambient[3] << ")" << endl;
+    os << "- diffuse(" << light.diffuse[0] << ", " << light.diffuse[1] << ", " << light.diffuse[2] << ", " << light.diffuse[3] << ")" << endl;
+    os << "- specular(" << light.specular[0] << ", " << light.specular[1] << ", " << light.specular[2] << ", " << light.specular[3] << ")" << endl;
+    os << "- position(" << light.position[0] << ", " << light.position[1] << ", " << light.position[2] << ", " << light.position[3] << ")" << endl;
+    os << "- spotDirection(" << light.spotDirection[0] << ", " << light.spotDirection[1] << ", " << light.spotDirection[2] << ", " << light.spotDirection[3] << ")" << endl;
     os << "- spotExponent(" << light.spotExponent << ")" << endl;
     os << "- spotCutOff(" << light.spotCutOff << ")" << endl;
-    os << "- attenuation(" << light.attenuation[0] << ", "<< light.attenuation[1] << ", " << light.attenuation[2] << ")" << endl;
+    os << "- attenuation(" << light.attenuation[0] << ", " << light.attenuation[1] << ", " << light.attenuation[2] << ")" << endl;
+    os << "- state(" << light.state << ")" << endl;
     os << endl;
     return os;
 }

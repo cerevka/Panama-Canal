@@ -5,7 +5,6 @@
 #include <GL/freeglut.h>
 
 #include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/xml_parser.hpp>
 
 #include <string>
 
@@ -32,7 +31,7 @@ public:
     /**
      * Vytvori novou kameru.
      */
-    Camera(const ptree* _config, const string& _name);
+    Camera(const string& _name, ptree& _config);
 
     /**
      * Znici kameru.
@@ -46,6 +45,12 @@ public:
      * @param GLfloat z Zova souradnice.
      */
     void setPosition(GLfloat _x, GLfloat _y, GLfloat _z);
+
+    /**
+     * Vrati souradnice kamery.
+     * @return
+     */
+    GLfloat* getPosition(void);
 
     /**
      * Nastavi smer kamery.
@@ -106,6 +111,18 @@ public:
      */
     void stepBackward(void);
 
+    /**
+     * Nastavi se dle nastaveni jine kamery.
+     * @param camera
+     */
+    void loadConfig(const Camera* camera);
+
+    /**
+     * Vypise konfiguraci kamery na vystup.
+     * @param ostream& os Vystupni stream.
+     * @param Camera& camera Vypisovany objekt.
+     * @return ostream& Vystupni stream.
+     */
     friend ostream& operator<<(ostream& os, Camera& camera);
 
 private:
@@ -121,7 +138,7 @@ private:
     /** Smer pohybu kamery. */
     GLfloat motionDirection[3];
 
-    void loadConfig(const ptree* _config, const string& _name);
+    void loadConfig(const string& _name, ptree& _config);
 };
 
 #endif	/* CAMERA_H */

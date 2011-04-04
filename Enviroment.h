@@ -21,7 +21,7 @@ using namespace std;
 using namespace boost;
 using namespace boost::property_tree;
 
-#define CAMERA_COUNT 3
+#define CAMERA_COUNT 4
 #define LIGHT_COUNT 2
 
 /**
@@ -44,6 +44,10 @@ public:
      * Titulek okna.
      */
     string windowTitle;
+
+    bool dynamicView;
+
+    float dynamicViewAngle;
 
     /**
      * Destruuje Enviroment.
@@ -117,11 +121,6 @@ public:
      * Inicializuje OpenGL.
      */
     void init(void);
-
-    /**
-     * Inicializuje svetla.
-     */
-    void initLights(void);
 
     /**
      * Vytvori menu.
