@@ -41,21 +41,19 @@ Light::~Light(void) {
 }
 
 void Light::switchOn(void) {
-    glEnable(name);
-    cout << "rozsviceno";
+    glEnable(name);    
     state = true;
 }
 
 void Light::switchOff(void) {
-    glDisable(name);
-    cout << "zhasnuto";
+    glDisable(name);    
     state = false;
 }
 
 void Light::setAmbient(GLfloat _r, GLfloat _g, GLfloat _b, GLfloat _a) {
     ambient[0] = _r;
     ambient[1] = _g;
-    ambient[2] = _b;
+    ambient[2] = _b; 
     ambient[3] = _a;
     glLightfv(name, GL_AMBIENT, ambient);
 }

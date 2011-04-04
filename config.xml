@@ -119,9 +119,9 @@
             <state>true</state>
             <dynamic>false</dynamic>
             <ambient>
-                <r>0.1</r>
-                <g>0.1</g>
-                <b>0.1</b>
+                <r>0.3</r>
+                <g>0.3</g>
+                <b>0.3</b>
                 <a>1.0</a>
             </ambient>
             <diffuse>

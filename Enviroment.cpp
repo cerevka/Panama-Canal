@@ -67,42 +67,42 @@ void Enviroment::keyboard(unsigned char _key, int _x, int _y) {
 }
 
 void Enviroment::specialKeyboard(int _key, int _x, int _y) {
-
+    Enviroment * enviroment = Enviroment::instance;
     switch (_key) {
         case GLUT_KEY_RIGHT:
         {
             // Kamera se natoci doleva.
-            Enviroment::getInstance()->camera->turnLeft();
+            enviroment->camera->turnLeft();
             break;
         }
         case GLUT_KEY_LEFT:
         {
             // Kamera se natoci doprava.
-            Enviroment::getInstance()->camera->turnRight();
+            enviroment->camera->turnRight();
             break;
         }
         case GLUT_KEY_UP:
         {
             // Kamera se posune dopredu.
-            Enviroment::getInstance()->camera->stepForward();
+            enviroment->camera->stepForward();
             break;
         }
         case GLUT_KEY_DOWN:
         {
             // Kamera se posune dozadu.
-            Enviroment::getInstance()->camera->stepBackward();
+            enviroment->camera->stepBackward();
             break;
         }
         case GLUT_KEY_PAGE_UP:
         {
             // Kamera zvedne pohled.
-            Enviroment::getInstance()->camera->turnUp();
+            enviroment->camera->turnUp();
             break;
         }
         case GLUT_KEY_PAGE_DOWN:
         {
             // Kamera skloni pohled.
-            Enviroment::getInstance()->camera->turnDown();
+            enviroment->camera->turnDown();
             break;
         }
         default:
@@ -112,20 +112,21 @@ void Enviroment::specialKeyboard(int _key, int _x, int _y) {
 }
 
 void Enviroment::mouse(int _button, int _state, int _x, int _y) {
+    Enviroment * enviroment = Enviroment::instance;
     if (_button == GLUT_LEFT_BUTTON) {
         if (_state == GLUT_DOWN) {
-            Enviroment::getInstance()->mouseLeftPressed = true;
-            Enviroment::getInstance()->lastCoordinate[0] = _x;
-            Enviroment::getInstance()->lastCoordinate[1] = _y;
+            enviroment->mouseLeftPressed = true;
+            enviroment->lastCoordinate[0] = _x;
+            enviroment->lastCoordinate[1] = _y;
         } else {
-            Enviroment::getInstance()->mouseLeftPressed = false;
+            enviroment->mouseLeftPressed = false;
         }
     }
 
 }
 
 void Enviroment::mouseMotion(int _x, int _y) {
-    Enviroment* enviroment = Enviroment::getInstance();
+    Enviroment* enviroment = Enviroment::instance;
     if (enviroment->mouseLeftPressed == true) {
         if (_x > enviroment->lastCoordinate[0]) {
             enviroment->camera->turnLeft();
@@ -158,7 +159,7 @@ void Enviroment::idle(void) {
 }
 
 void Enviroment::menu(int _selectedItem) {
-    Enviroment* enviroment = Enviroment::getInstance();
+    Enviroment* enviroment = Enviroment::instance;
     switch (_selectedItem) {
         case 0:
             exit(0);
@@ -255,9 +256,10 @@ void Enviroment::createMenu(void) {
 }
 
 void Enviroment::drawScene(void) {
+    Enviroment * enviroment = Enviroment::instance;
     // Nastavi pozici a orientaci kamery.
     glLoadIdentity();
-    Enviroment::instance->camera->look();
+    enviroment->camera->look();
 
     // Repozicuji se staticka svetla.
     for (int i = 0; i < LIGHT_COUNT; ++i) {
@@ -266,10 +268,6 @@ void Enviroment::drawScene(void) {
             lights[i]->reSpotDirection();
         }
     }
-
-    
-
-    cout << *(lights[0]);
 
     // Nakresli se podklad.
     glPushMatrix();    
