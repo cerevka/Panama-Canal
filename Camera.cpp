@@ -40,34 +40,42 @@ void Camera::setMotionDirection(GLfloat _x, GLfloat _y, GLfloat _z) {
 
 void Camera::look(void) {
 
-
-    // Spocte smerove souradnice.
-    setViewDirection(
-            cos(rotationAngle * DEG_TO_RAD) * cos(elevationAngle * DEG_TO_RAD),
-            sin(elevationAngle * DEG_TO_RAD),
-            sin(rotationAngle * DEG_TO_RAD) * cos(elevationAngle * DEG_TO_RAD)
-            );
-
-    // Spocte souradnice pohybu.
-    setMotionDirection(
-            cos(rotationAngle * DEG_TO_RAD),
-            0.0,
-            sin(rotationAngle * DEG_TO_RAD)
-            );
-
-    // Spocte souradnice upvectoru.
-    setUpvector(
-            -cos(rotationAngle * DEG_TO_RAD) * sin(elevationAngle * DEG_TO_RAD),
-            cos(elevationAngle * DEG_TO_RAD),
-            -sin(rotationAngle * DEG_TO_RAD) * sin(elevationAngle * DEG_TO_RAD)
-            );
+    if (Enviroment::getInstance()->dynamicView != true) {
+        // Spocte smerove souradnice.
+        setViewDirection(
+                cos(rotationAngle * DEG_TO_RAD) * cos(elevationAngle * DEG_TO_RAD),
+                sin(elevationAngle * DEG_TO_RAD),
+                sin(rotationAngle * DEG_TO_RAD) * cos(elevationAngle * DEG_TO_RAD)
+                );
 
 
-    gluLookAt(
-            position[0], position[1], position[2], // pozice kamery
-            position[0] + viewDirection[0], position[1] + viewDirection[1], position[2] + viewDirection[2], // smer kamery
-            upvector[0], upvector[1], upvector[2] // up vektor
-            );
+        // Spocte souradnice pohybu.
+        setMotionDirection(
+                cos(rotationAngle * DEG_TO_RAD),
+                0.0,
+                sin(rotationAngle * DEG_TO_RAD)
+                );
+
+        // Spocte souradnice upvectoru.
+        setUpvector(
+                -cos(rotationAngle * DEG_TO_RAD) * sin(elevationAngle * DEG_TO_RAD),
+                cos(elevationAngle * DEG_TO_RAD),
+                -sin(rotationAngle * DEG_TO_RAD) * sin(elevationAngle * DEG_TO_RAD)
+                );
+
+        gluLookAt(
+                position[0], position[1], position[2], // pozice kamery
+                position[0] + viewDirection[0], position[1] + viewDirection[1], position[2] + viewDirection[2], // smer kamery
+                upvector[0], upvector[1], upvector[2] // up vektor
+                );
+    } else {
+        gluLookAt(
+                position[0], position[1], position[2], // pozice kamery
+                viewDirection[0], viewDirection[1], viewDirection[2], // smer kamery
+                upvector[0], upvector[1], upvector[2] // up vektor
+                );
+    }
+
 }
 
 void Camera::turnLeft(void) {

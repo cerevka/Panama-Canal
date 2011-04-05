@@ -32,7 +32,7 @@ void Enviroment::display(void) {
     // Zacatek kresleni sceny.
     glMatrixMode(GL_MODELVIEW);
 
-    glPushMatrix();   
+    glPushMatrix();
     Enviroment::instance->drawScene();
     glPopMatrix();
 
@@ -149,13 +149,13 @@ void Enviroment::idle(void) {
     Enviroment* enviroment = Enviroment::instance;
     if (enviroment->dynamicView == true) {
         enviroment->dynamicViewAngle += 0.3;
-        GLfloat* position = enviroment->camera->getPosition();
-        enviroment->camera->setPosition(cos(enviroment->dynamicViewAngle * DEG_TO_RAD) * 5, 0.5, sin(enviroment->dynamicViewAngle * DEG_TO_RAD) * 5);
-        enviroment->camera->setViewDirection(1.0, 0.0, 1.0);
+        //GLfloat* position = enviroment->camera->getPosition();
+        enviroment->camera->setPosition(cos(enviroment->dynamicViewAngle * DEG_TO_RAD) * 5, 5, sin(enviroment->dynamicViewAngle * DEG_TO_RAD) * 5);
+        enviroment->camera->setViewDirection(0.0, 0.0, 0.0);
     }
 
     // Prekresluje.
-    //glutPostRedisplay();
+    glutPostRedisplay();
 }
 
 void Enviroment::menu(int _selectedItem) {
@@ -166,21 +166,24 @@ void Enviroment::menu(int _selectedItem) {
             break;
         case 11:
             // Staticky pohled 1.
-            enviroment->camera = enviroment->cameras[0];           
+            enviroment->camera = enviroment->cameras[0];
+            enviroment->dynamicView = false;
             break;
         case 12:
             // Staticky pohled 2.
-            enviroment->camera = enviroment->cameras[1];            
+            enviroment->camera = enviroment->cameras[1];
+            enviroment->dynamicView = false;
             break;
         case 13:
             // Dynamicky pohled.
-            enviroment->camera = enviroment->cameras[2];            
+            enviroment->camera = enviroment->cameras[2];
             enviroment->dynamicView = true;
             break;
         case 14:
             // Pohybliva kamera.
             enviroment->cameras[3]->loadConfig(enviroment->camera);
-            enviroment->camera = enviroment->cameras[3];            
+            enviroment->camera = enviroment->cameras[3];
+            enviroment->dynamicView = false;
             break;
         case 21:
             // Zapinani a vypinani slunce.
@@ -209,7 +212,7 @@ void Enviroment::init(void) {
     glPolygonMode(GL_BACK, GL_FILL);
 
     // Zahazuji se zadni strany polygony.
-    glCullFace(GL_BACK);
+    //glCullFace(GL_BACK);
 
     // Vytvori kamery.
     for (int i = 0; i < CAMERA_COUNT; ++i) {
@@ -261,6 +264,8 @@ void Enviroment::drawScene(void) {
     glLoadIdentity();
     enviroment->camera->look();
 
+    //cout << *camera;
+
     // Repozicuji se staticka svetla.
     for (int i = 0; i < LIGHT_COUNT; ++i) {
         if (lights[i]->dynamic == false) {
@@ -270,13 +275,13 @@ void Enviroment::drawScene(void) {
     }
 
     // Nakresli se podklad.
-    glPushMatrix();    
+    glPushMatrix();
     drawPlane(100);
     glPopMatrix();
 
     // Nakresli cajnik.
-    glPushMatrix();    
-    glTranslated(0.0, 0.5, 0.0);
+    glPushMatrix();
+    glTranslated(0.0, 0.3, 0.0);
     GLfloat ambient[] = {0.4, 0.4, 0.4, 1.0f};
     glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
     GLfloat diffuse[] = {0.8, 0.8, 0.8, 1.0};
@@ -285,7 +290,8 @@ void Enviroment::drawScene(void) {
     glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
     glMaterialf(GL_FRONT, GL_SHININESS, 100.0);
 
-    glutSolidTeapot(0.5);
+    //glutSolidTeapot(0.5);
+    drawShip();
     drawAxes(1.0);
     glPopMatrix();
 }
@@ -376,4 +382,91 @@ void Enviroment::drawPlane(int subdiv) {
 
         glEnd();
     }
+}
+
+void Enviroment::drawShip(void) {
+    glDisable(GL_LIGHTING);
+    GLfloat verteces[] = {
+        1.0, 0.0, 0.0, 1.0, 0.0, 0.0, -1.0, -1.0, 0.0, 1.0,
+        1.0, 0.0, 0.0, 1.0, 0.0, 0.0, -1.0, 1.0, 0.0, 1.0,
+        1.0, 0.0, 0.0, 1.0, 0.0, 0.0, -1.0, 1.0, 0.0, -1.0,
+        1.0, 0.0, 0.0, 1.0, 0.0, 0.0, -1.0, -1.0, 0.0, -1.0,
+        0.0, 0.0, 1.0, 1.0, 0.0, 0.0, -1.0, -1.0, 0.25, 1.0,
+        0.0, 0.0, 1.0, 1.0, 0.0, 0.0, -1.0, 1.0, 0.25, 1.0,
+        0.0, 0.0, 1.0, 1.0, 0.0, 0.0, -1.0, 1.0, 0.25, -1.0,
+        0.0, 0.0, 1.0, 1.0, 0.0, 0.0, -1.0, -1.0, 0.25, -1.0,
+        0.0, 1.0, 1.0, 1.0, 0.0, 0.0, -1.0, -3.0, 0.0, 0.0,
+        0.0, 1.0, 1.0, 1.0, 0.0, 0.0, -1.0, -3.0, 0.25, 0.0,
+        0.0, 1.0, 0.0, 1.0, 0.0, 0.0, -1.0, -0.8, 0.25, 0.8,
+        0.0, 1.0, 0.0, 1.0, 0.0, 0.0, -1.0, 0.8, 0.25, 0.8,
+        0.0, 1.0, 0.0, 1.0, 0.0, 0.0, -1.0, 0.8, 0.25, -0.8,
+        0.0, 1.0, 0.0, 1.0, 0.0, 0.0, -1.0, -0.8, 0.25, -0.8,
+        1.0, 1.0, 0.0, 1.0, 0.0, 0.0, -1.0, -0.8, 0.05, 0.8,
+        1.0, 1.0, 0.0, 1.0, 0.0, 0.0, -1.0, 0.8, 0.05, 0.8,
+        1.0, 1.0, 0.0, 1.0, 0.0, 0.0, -1.0, 0.8, 0.05, -0.8,
+        1.0, 1.0, 0.0, 1.0, 0.0, 0.0, -1.0, -0.8, 0.05, -0.8
+    };
+
+    glEnableClientState(GL_COLOR_ARRAY);
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_NORMAL_ARRAY);
+
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glInterleavedArrays(GL_C4F_N3F_V3F, 0, verteces);
+    //glVertexPointer(3, GL_FLOAT, 0, verteces);
+
+    {
+        // 4 steny
+        GLuint indices[] = {4, 0, 5, 1, 6, 2, 7, 3, 4, 0};
+        glDrawElements(GL_QUAD_STRIP, 10, GL_UNSIGNED_INT, indices);
+    }
+
+    {
+        // dno
+        GLuint indices[] = {0, 1, 2, 3};
+        glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, indices);
+    }
+
+    {
+        // 4 steny vnitrku
+        GLuint indices[] = {10, 14, 11, 15, 12, 16, 13, 17, 10, 14};
+        glDrawElements(GL_QUAD_STRIP, 10, GL_UNSIGNED_INT, indices);
+    }
+
+    {
+        // dno vnitrku
+        GLuint indices[] = {14, 15, 16, 17};
+        glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, indices);
+    }
+
+    {
+        // horni okraje
+        GLuint indices[] = {10, 4, 11, 5, 12, 6, 13, 7, 10, 4};
+        glDrawElements(GL_QUAD_STRIP, 10, GL_UNSIGNED_INT, indices);
+    }
+
+    {
+        // spicka okraje
+        GLuint indices[] = {4, 0, 9, 8, 7, 3};
+        glDrawElements(GL_QUAD_STRIP, 6, GL_UNSIGNED_INT, indices);
+    }
+
+    {
+        // spicka spodek
+        GLuint indices[] = {0, 8, 3};
+        glDrawElements(GL_TRIANGLES, 4, GL_UNSIGNED_INT, indices);
+    }
+
+    {
+        // spicka vrsek
+        GLuint indices[] = {4, 9, 7};
+        glDrawElements(GL_TRIANGLES, 4, GL_UNSIGNED_INT, indices);
+    }
+
+
+
+
+
+
+    glEnable(GL_LIGHTING);
 }

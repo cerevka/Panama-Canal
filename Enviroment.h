@@ -47,7 +47,8 @@ public:
 
     bool dynamicView;
 
-    float dynamicViewAngle;
+    float dynamicViewAngle;   
+
 
     /**
      * Destruuje Enviroment.
@@ -173,6 +174,8 @@ private:
     void loadConfig(const string& _file);
 
     void drawPlane(int subdiv);
+
+    void drawShip(void);
 
 };
 
