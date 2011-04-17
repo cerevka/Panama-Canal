@@ -42,12 +42,12 @@ Light::~Light(void) {
 
 void Light::switchOn(void) {
     glEnable(name);    
-    state = true;
-}
+    enabled = true;
+} 
 
 void Light::switchOff(void) {
     glDisable(name);    
-    state = false;
+    enabled = false;
 }
 
 void Light::setAmbient(GLfloat _r, GLfloat _g, GLfloat _b, GLfloat _a) {
@@ -118,7 +118,7 @@ void Light::setAttenuation(GLfloat _constant, GLfloat _linear, GLfloat _quadrati
 }
 
 bool Light::getState(void) {
-    return state;
+    return enabled;
 }
 
 void Light::loadConfig(const string& _name, ptree& _config) {
@@ -126,8 +126,8 @@ void Light::loadConfig(const string& _name, ptree& _config) {
     try {
         // Nastavi se promenne svetlu.
         dynamic = _config.get<bool>(path + "dynamic");
-        state = _config.get<bool>(path + "state");
-        if (state == true) {
+        enabled = _config.get<bool>(path + "enabled");
+        if (enabled == true) {
             switchOn();
         } else {
             switchOff();
@@ -187,7 +187,7 @@ ostream & operator<<(ostream& os, Light& light) {
     os << "- spotExponent(" << light.spotExponent << ")" << endl;
     os << "- spotCutOff(" << light.spotCutOff << ")" << endl;
     os << "- attenuation(" << light.attenuation[0] << ", " << light.attenuation[1] << ", " << light.attenuation[2] << ")" << endl;
-    os << "- state(" << light.state << ")" << endl;
+    os << "- state(" << light.enabled << ")" << endl;
     os << endl;
     return os;
 }

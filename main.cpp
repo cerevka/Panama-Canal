@@ -45,7 +45,7 @@ int main(int argc, char** argv) {
 
     enviroment->init();
 
-    // Spusti hlavni smysku.
+    // Spusti hlavni smycku.
     glutMainLoop();
 
     delete enviroment;

@@ -5,6 +5,7 @@
 
 Camera::Camera(const string& _name, ptree& _config) {
     loadConfig(_name, _config);
+    setType(WALK);
 }
 
 Camera::~Camera() {
@@ -39,48 +40,83 @@ void Camera::setMotionDirection(GLfloat _x, GLfloat _y, GLfloat _z) {
 }
 
 void Camera::look(void) {
+    (this->*lookFce)();
+}
 
-    if (Enviroment::getInstance()->dynamicView != true) {
-        // Spocte smerove souradnice.
-        setViewDirection(
-                cos(rotationAngle * DEG_TO_RAD) * cos(elevationAngle * DEG_TO_RAD),
-                sin(elevationAngle * DEG_TO_RAD),
-                sin(rotationAngle * DEG_TO_RAD) * cos(elevationAngle * DEG_TO_RAD)
-                );
+void Camera::lookStatic(void) {
+    gluLookAt(
+            position[0], position[1], position[2], // pozice kamery
+            viewDirection[0], viewDirection[1], viewDirection[2], // smer kamery
+            upvector[0], upvector[1], upvector[2] // up vektor
+            );
+}
+
+void Camera::lookWalk(void) {
 
 
-        // Spocte souradnice pohybu.
-        setMotionDirection(
-                cos(rotationAngle * DEG_TO_RAD),
-                0.0,
-                sin(rotationAngle * DEG_TO_RAD)
-                );
+    // Spocte smerove souradnice.
+    setViewDirection(
+            cos(Enviroment::DegToRad(rotationAngle)) * cos(Enviroment::DegToRad(elevationAngle)),
+            sin(Enviroment::DegToRad(elevationAngle)),
+            sin(Enviroment::DegToRad(rotationAngle)) * cos(Enviroment::DegToRad(elevationAngle))
+            );
 
-        // Spocte souradnice upvectoru.
-        setUpvector(
-                -cos(rotationAngle * DEG_TO_RAD) * sin(elevationAngle * DEG_TO_RAD),
-                cos(elevationAngle * DEG_TO_RAD),
-                -sin(rotationAngle * DEG_TO_RAD) * sin(elevationAngle * DEG_TO_RAD)
-                );
 
-        gluLookAt(
-                position[0], position[1], position[2], // pozice kamery
-                position[0] + viewDirection[0], position[1] + viewDirection[1], position[2] + viewDirection[2], // smer kamery
-                upvector[0], upvector[1], upvector[2] // up vektor
-                );
-    } else {
-        gluLookAt(
-                position[0], position[1], position[2], // pozice kamery
-                viewDirection[0], viewDirection[1], viewDirection[2], // smer kamery
-                upvector[0], upvector[1], upvector[2] // up vektor
-                );
-    }
+    // Spocte souradnice pohybu.
+    setMotionDirection(
+            cos(Enviroment::DegToRad(rotationAngle)),
+            0.0,
+            sin(Enviroment::DegToRad(rotationAngle))
+            );
 
+    // Spocte souradnice upvectoru.
+    setUpvector(
+            -cos(Enviroment::DegToRad(rotationAngle)) * sin(Enviroment::DegToRad(elevationAngle)),
+            cos(Enviroment::DegToRad(elevationAngle)),
+            -sin(Enviroment::DegToRad(rotationAngle)) * sin(Enviroment::DegToRad(elevationAngle))
+            );
+
+    gluLookAt(
+            position[0], position[1], position[2], // pozice kamery
+            position[0] + viewDirection[0], position[1] + viewDirection[1], position[2] + viewDirection[2], // smer kamery
+            upvector[0], upvector[1], upvector[2] // up vektor
+            );
+}
+
+void Camera::lookFree(void) {
+    // Spocte smerove souradnice.
+    setViewDirection(
+            cos(Enviroment::DegToRad(rotationAngle)) * cos(Enviroment::DegToRad(elevationAngle)),
+            sin(Enviroment::DegToRad(elevationAngle)),
+            sin(Enviroment::DegToRad(rotationAngle)) * cos(Enviroment::DegToRad(elevationAngle))
+            );
+
+
+    // Spocte souradnice pohybu.
+    setMotionDirection(
+            cos(Enviroment::DegToRad(rotationAngle)),
+            0.0,
+            sin(Enviroment::DegToRad(rotationAngle))
+            );
+
+    // Spocte souradnice upvectoru.
+    setUpvector(
+            -cos(Enviroment::DegToRad(rotationAngle)) * sin(Enviroment::DegToRad(elevationAngle)),
+            cos(Enviroment::DegToRad(elevationAngle)),
+            -sin(Enviroment::DegToRad(rotationAngle)) * sin(Enviroment::DegToRad(elevationAngle))
+            );
+
+    gluLookAt(
+            position[0], position[1], position[2], // pozice kamery
+            position[0] + viewDirection[0], position[1] + viewDirection[1], position[2] + viewDirection[2], // smer kamery
+            upvector[0], upvector[1], upvector[2] // up vektor
+            );
 }
 
 void Camera::turnLeft(void) {
     rotationAngle += rotationAngleStep;
     if (rotationAngle > 360.0) {
+
         rotationAngle -= 360.0;
     }
 }
@@ -88,6 +124,7 @@ void Camera::turnLeft(void) {
 void Camera::turnRight(void) {
     rotationAngle -= rotationAngleStep;
     if (rotationAngle < -360.0) {
+
         rotationAngle += 360.0;
     }
 }
@@ -95,6 +132,7 @@ void Camera::turnRight(void) {
 void Camera::turnUp(void) {
     elevationAngle += elevationAngleStep;
     if (elevationAngle > 75.0) {
+
         elevationAngle = 75.0;
     }
 }
@@ -102,23 +140,27 @@ void Camera::turnUp(void) {
 void Camera::turnDown(void) {
     elevationAngle -= elevationAngleStep;
     if (elevationAngle < -75.0) {
+
         elevationAngle = -75.0;
     }
 }
 
 void Camera::stepForward(void) {
+
     position[0] += step * motionDirection[0];
     position[1] += step * motionDirection[1];
     position[2] += step * motionDirection[2];
 }
 
 void Camera::stepBackward(void) {
+
     position[0] -= step * motionDirection[0];
     position[1] -= step * motionDirection[1];
     position[2] -= step * motionDirection[2];
 }
 
 void Camera::loadConfig(const Camera* camera) {
+
     setPosition(camera->position[0], camera->position[1], camera->position[2]);
     setViewDirection(camera->viewDirection[0], camera->viewDirection[1], camera->viewDirection[2]);
     setUpvector(camera->upvector[0], camera->upvector[1], camera->upvector[2]);
@@ -155,8 +197,24 @@ void Camera::loadConfig(const string& _name, ptree& _config) {
         cerr << "Camera " + _name + "::loadConfig -> PTree Bad Path." << endl;
         exit(1);
     } catch (ptree_bad_data exception) {
+
         cerr << "Camera " + _name + "::loadConfig -> PTree Bad Data." << endl;
         exit(1);
+    }
+}
+
+void Camera::setType(typeEnum _type) {
+    switch (_type) {
+        case STATIC:
+            lookFce = &Camera::lookStatic;
+            break;
+        case WALK:
+            lookFce = &Camera::lookWalk;
+            break;
+        case FREE:
+            lookFce = &Camera::lookFree;
+
+            break;
     }
 }
 

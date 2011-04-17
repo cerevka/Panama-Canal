@@ -113,10 +113,39 @@
                 </angle>
             </motion>
         </camera-3>
+        <camera-4>
+            <position>
+                <x>-3.0</x>
+                <y>0.5</y>
+                <z>0.0</z>
+            </position>
+            <direction>
+                <x>0.0</x>
+                <y>0.0</y>
+                <z>0.0</z>
+            </direction>
+            <upvector>
+                <x>0.0</x>
+                <y>1.0</y>
+                <z>0.0</z>
+            </upvector>
+            <rotation>0.0</rotation>
+            <elevation>0.0</elevation>
+            <motion>
+                <x>0.0</x>
+                <y>0.0</y>
+                <z>-1.0</z>
+                <step>0.2</step>
+                <angle>
+                    <rotation-step>3.0</rotation-step>
+                    <elevation-step>0.5</elevation-step>
+                </angle>
+            </motion>
+        </camera-4>
     </cameras>
     <lights>
         <light-0>
-            <state>true</state>
+            <enabled>true</enabled>
             <dynamic>false</dynamic>
             <ambient>
                 <r>0.3</r>
@@ -156,7 +185,7 @@
             </attenuation>
         </light-0>
         <light-1>
-            <state>false</state>
+            <enabled>false</enabled>
             <dynamic>true</dynamic>
             <ambient>
                 <r>0.5</r>

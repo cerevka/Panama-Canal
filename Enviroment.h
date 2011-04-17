@@ -1,8 +1,6 @@
 #ifndef ENVIROMENT_H
 #define	ENVIROMENT_H
 
-#define DEG_TO_RAD (3.14159/180.0)
-
 #include <GL/gl.h>
 #include <GL/freeglut.h>
 
@@ -21,7 +19,7 @@ using namespace std;
 using namespace boost;
 using namespace boost::property_tree;
 
-#define CAMERA_COUNT 4
+#define CAMERA_COUNT 5
 #define LIGHT_COUNT 2
 
 /**
@@ -45,10 +43,7 @@ public:
      */
     string windowTitle;
 
-    bool dynamicView;
-
-    float dynamicViewAngle;   
-
+    float dynamicViewAngle;
 
     /**
      * Destruuje Enviroment.
@@ -70,40 +65,40 @@ public:
     /**
      * Meni velikost okna.
      * Callback pro GLUT volany pri zmene velikosti okna.
-     * @param int width Sirka okna.
-     * @param int height Vyska okna.
+     * @param _width Sirka okna.
+     * @param _height Vyska okna.
      */
     static void reshape(int _width, int _height);
 
     /**
      * Odchytava stisky klavesy.
-     * @param unsigned char key Kod klavesy.
-     * @param int x Xova souradnice mysi.
-     * @param int y Yova souradnice mysi.
+     * @param  char key Kod klavesy.
+     * @param _x Xova souradnice mysi.
+     * @param _y Yova souradnice mysi.
      */
     static void keyboard(unsigned char _key, int _x, int _y);
 
     /**
      * Odchytava stisky specialnich klaves.
-     * @param int key Kod klavesy.
-     * @param int x Xova souradnice mysi.
-     * @param int y Yova souradnice mysi.
+     * @param _key Kod klavesy.
+     * @param _x Xova souradnice mysi.
+     * @param _y Yova souradnice mysi.
      */
     static void specialKeyboard(int _key, int _x, int _y);
 
     /**
      * Odchytava klikani mysi.
-     * @param int button Identifikator tlacitka.
-     * @param int state Identifikator stavu tlacitka.
-     * @param int x Xova souradnice.
-     * @param int y Yova souradnice.
+     * @param _button Identifikator tlacitka.
+     * @param _state Identifikator stavu tlacitka.
+     * @param _x Xova souradnice.
+     * @param _y Yova souradnice.
      */
     static void mouse(int _button, int _state, int _x, int _y);
 
     /**
      * Odchytava pohyb mysi.
-     * @param int x Xova souradnice.
-     * @param int y Yova souradnice.
+     * @param _x Xova souradnice.
+     * @param _y Yova souradnice.
      */
     static void mouseMotion(int _x, int _y);
 
@@ -114,9 +109,23 @@ public:
 
     /**
      * Ovlada kontextova menu.
-     * @param int selectedItem ID zvolene polozky.s
+     * @param _selectedItem ID zvolene polozky.s
      */
     static void menu(int _selectedItem);
+
+    /**
+     * Prevadi stupne na radiany.
+     * @param _deg Stupne.
+     * @return Radiany.
+     */
+    static float DegToRad(float _deg);
+
+    /**
+     * Prevadi radiany na stupne.
+     * @param _rad Radiany.
+     * @return Stupne.
+     */
+    static float RadToDeg(float _rad);
 
     /**
      * Inicializuje OpenGL.
@@ -135,7 +144,7 @@ public:
 
     /**
      * Vykresli osy x, y, z.
-     * @param float _length Delka os.
+     * @param _length Delka os.
      */
     void drawAxes(float _length);
 
@@ -169,12 +178,19 @@ private:
 
     /**
      * Nacte nastaveni z daneho souboru.
-     * @param file
+     * @param _file
      */
     void loadConfig(const string& _file);
 
-    void drawPlane(int subdiv);
+    /**
+     * Kresli zeleny podklad.
+     * @param _subdiv Pocet casti.
+     */
+    void drawPlane(int _subdiv);
 
+    /**
+     * Kresli lod.
+     */
     void drawShip(void);
 
 };

@@ -158,7 +158,7 @@ private:
     GLfloat attenuation[3];
 
     /** Indikace zapnuti/vypnuti. */
-    bool state;
+    bool enabled;  
 
     void loadConfig(const string& _name, ptree& _config);
 };

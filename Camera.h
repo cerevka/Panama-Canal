@@ -13,6 +13,9 @@ using namespace boost::property_tree;
 
 class Camera {
 public:
+    /** Ruzne typy kamer. */
+    enum typeEnum {STATIC, WALK, FREE};
+
     /** Velikost kroku kamery. */
     float step;
 
@@ -118,6 +121,12 @@ public:
     void loadConfig(const Camera* camera);
 
     /**
+     * Nastavi typ kamery.
+     * @param type Typ kamery.
+     */
+    void setType(typeEnum _type);
+
+    /**
      * Vypise konfiguraci kamery na vystup.
      * @param ostream& os Vystupni stream.
      * @param Camera& camera Vypisovany objekt.
@@ -139,6 +148,23 @@ private:
     GLfloat motionDirection[3];
 
     void loadConfig(const string& _name, ptree& _config);
+
+    void (Camera::*lookFce)(void);
+
+    /**
+     * Umisti statickou kameru.
+     */
+    void lookStatic(void);
+
+    /**
+     * Umisti chodici kameru kameru.
+     */
+    void lookWalk(void);
+
+    /**
+     * Umisti volnou kameru.
+     */
+    void lookFree(void);
 };
 
 #endif	/* CAMERA_H */

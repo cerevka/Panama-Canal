@@ -10,7 +10,6 @@ Enviroment::Enviroment(void) {
     instance = this;
     mouseLeftPressed = false;
     sunAngle = 90.0;
-    dynamicView = false;
     dynamicViewAngle = 0.0;
 }
 
@@ -147,12 +146,14 @@ void Enviroment::mouseMotion(int _x, int _y) {
 
 void Enviroment::idle(void) {
     Enviroment* enviroment = Enviroment::instance;
+    /*
     if (enviroment->dynamicView == true) {
         enviroment->dynamicViewAngle += 0.3;
         //GLfloat* position = enviroment->camera->getPosition();
         enviroment->camera->setPosition(cos(enviroment->dynamicViewAngle * DEG_TO_RAD) * 5, 5, sin(enviroment->dynamicViewAngle * DEG_TO_RAD) * 5);
         enviroment->camera->setViewDirection(0.0, 0.0, 0.0);
-    }
+    }*/
+    // TODO pohyb kamery
 
     // Prekresluje.
     glutPostRedisplay();
@@ -167,23 +168,24 @@ void Enviroment::menu(int _selectedItem) {
         case 11:
             // Staticky pohled 1.
             enviroment->camera = enviroment->cameras[0];
-            enviroment->dynamicView = false;
             break;
         case 12:
             // Staticky pohled 2.
             enviroment->camera = enviroment->cameras[1];
-            enviroment->dynamicView = false;
             break;
         case 13:
             // Dynamicky pohled.
             enviroment->camera = enviroment->cameras[2];
-            enviroment->dynamicView = true;
             break;
         case 14:
-            // Pohybliva kamera.
+            // Chodici kamera.
             enviroment->cameras[3]->loadConfig(enviroment->camera);
             enviroment->camera = enviroment->cameras[3];
-            enviroment->dynamicView = false;
+            break;
+        case 15:
+            // Volna kamera.
+            enviroment->cameras[4]->loadConfig(enviroment->camera);
+            enviroment->camera = enviroment->cameras[4];
             break;
         case 21:
             // Zapinani a vypinani slunce.
@@ -202,6 +204,14 @@ void Enviroment::menu(int _selectedItem) {
             }
     }
     glutPostRedisplay();
+}
+
+float Enviroment::DegToRad(float _deg) {
+    return _deg * (M_PI / 180);
+}
+
+float Enviroment::RadToDeg(float _rad) {
+    return _rad * (180 / M_PI);
 }
 
 void Enviroment::init(void) {
@@ -225,7 +235,7 @@ void Enviroment::init(void) {
         }
     }
     // Nastavi se aktualni kamera.
-    camera = cameras[2];
+    camera = cameras[3];
 
     // Zapnuti osvetleni.
     glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
@@ -243,6 +253,7 @@ void Enviroment::createMenu(void) {
     glutAddMenuEntry("Static view 2", 12);
     glutAddMenuEntry("Dynamic view", 13);
     glutAddMenuEntry("Walk", 14);
+    glutAddMenuEntry("Free camera", 15);
 
     int lightMenu = glutCreateMenu(Enviroment::menu);
     glutAddMenuEntry("Switch on/off sun", 21);
@@ -259,6 +270,7 @@ void Enviroment::createMenu(void) {
 }
 
 void Enviroment::drawScene(void) {
+
     Enviroment * enviroment = Enviroment::instance;
     // Nastavi pozici a orientaci kamery.
     glLoadIdentity();
@@ -281,7 +293,7 @@ void Enviroment::drawScene(void) {
 
     // Nakresli cajnik.
     glPushMatrix();
-    glTranslated(0.0, 0.3, 0.0);
+    glTranslated(0.0, 0.0, 0.0);
     GLfloat ambient[] = {0.4, 0.4, 0.4, 1.0f};
     glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
     GLfloat diffuse[] = {0.8, 0.8, 0.8, 1.0};
@@ -292,7 +304,7 @@ void Enviroment::drawScene(void) {
 
     //glutSolidTeapot(0.5);
     drawShip();
-    drawAxes(1.0);
+    drawAxes(2.0);
     glPopMatrix();
 }
 
@@ -385,82 +397,214 @@ void Enviroment::drawPlane(int subdiv) {
 }
 
 void Enviroment::drawShip(void) {
-    glDisable(GL_LIGHTING);
-    GLfloat verteces[] = {
-        1.0, 0.0, 0.0, 1.0, 0.0, 0.0, -1.0, -1.0, 0.0, 1.0,
-        1.0, 0.0, 0.0, 1.0, 0.0, 0.0, -1.0, 1.0, 0.0, 1.0,
-        1.0, 0.0, 0.0, 1.0, 0.0, 0.0, -1.0, 1.0, 0.0, -1.0,
-        1.0, 0.0, 0.0, 1.0, 0.0, 0.0, -1.0, -1.0, 0.0, -1.0,
-        0.0, 0.0, 1.0, 1.0, 0.0, 0.0, -1.0, -1.0, 0.25, 1.0,
-        0.0, 0.0, 1.0, 1.0, 0.0, 0.0, -1.0, 1.0, 0.25, 1.0,
-        0.0, 0.0, 1.0, 1.0, 0.0, 0.0, -1.0, 1.0, 0.25, -1.0,
-        0.0, 0.0, 1.0, 1.0, 0.0, 0.0, -1.0, -1.0, 0.25, -1.0,
-        0.0, 1.0, 1.0, 1.0, 0.0, 0.0, -1.0, -3.0, 0.0, 0.0,
-        0.0, 1.0, 1.0, 1.0, 0.0, 0.0, -1.0, -3.0, 0.25, 0.0,
-        0.0, 1.0, 0.0, 1.0, 0.0, 0.0, -1.0, -0.8, 0.25, 0.8,
-        0.0, 1.0, 0.0, 1.0, 0.0, 0.0, -1.0, 0.8, 0.25, 0.8,
-        0.0, 1.0, 0.0, 1.0, 0.0, 0.0, -1.0, 0.8, 0.25, -0.8,
-        0.0, 1.0, 0.0, 1.0, 0.0, 0.0, -1.0, -0.8, 0.25, -0.8,
-        1.0, 1.0, 0.0, 1.0, 0.0, 0.0, -1.0, -0.8, 0.05, 0.8,
-        1.0, 1.0, 0.0, 1.0, 0.0, 0.0, -1.0, 0.8, 0.05, 0.8,
-        1.0, 1.0, 0.0, 1.0, 0.0, 0.0, -1.0, 0.8, 0.05, -0.8,
-        1.0, 1.0, 0.0, 1.0, 0.0, 0.0, -1.0, -0.8, 0.05, -0.8
-    };
+    //glDisable(GL_LIGHTING);
+    glEnable(GL_COLOR_MATERIAL);
+    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 
     glEnableClientState(GL_COLOR_ARRAY);
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
 
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    glInterleavedArrays(GL_C4F_N3F_V3F, 0, verteces);
-    //glVertexPointer(3, GL_FLOAT, 0, verteces);
-
+    // Dno.
     {
-        // 4 steny
-        GLuint indices[] = {4, 0, 5, 1, 6, 2, 7, 3, 4, 0};
-        glDrawElements(GL_QUAD_STRIP, 10, GL_UNSIGNED_INT, indices);
+        GLfloat verteces[] = {
+            0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, -0.3, 0.0, -0.75,
+            0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, +0.3, 0.0, -0.75,
+            0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, +0.3, 0.0, 0.25,
+            0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, -0.3, 0.0, 0.25
+        };
+        glInterleavedArrays(GL_C4F_N3F_V3F, 0, verteces);
+        glDrawArrays(GL_QUADS, 0, 4);
     }
 
+    // Dno spicky.
     {
-        // dno
-        GLuint indices[] = {0, 1, 2, 3};
-        glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, indices);
+        GLfloat verteces[] = {
+            0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, -0.3, 0.0, 0.25,
+            0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.3, 0.0, 0.25,
+            0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.75
+        };
+        glInterleavedArrays(GL_C4F_N3F_V3F, 0, verteces);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
     }
 
+    // Zadni stena
     {
-        // 4 steny vnitrku
-        GLuint indices[] = {10, 14, 11, 15, 12, 16, 13, 17, 10, 14};
-        glDrawElements(GL_QUAD_STRIP, 10, GL_UNSIGNED_INT, indices);
+        GLfloat verteces[] = {
+            1.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, -0.3, 0.2, -0.75,
+            1.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, -0.3, 0.0, -0.75,
+            1.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.3, 0.0, -0.75,
+            1.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.3, 0.2, -0.75
+        };
+        glInterleavedArrays(GL_C4F_N3F_V3F, 0, verteces);
+        glDrawArrays(GL_QUADS, 0, 4);
     }
 
+    // Prava stena.
     {
-        // dno vnitrku
-        GLuint indices[] = {14, 15, 16, 17};
-        glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, indices);
+        GLfloat verteces[] = {
+            1.0, 0.5, 0.0, 0.0, 1.0, 0.0, 0.0, -0.3, 0.2, -0.75,
+            1.0, 0.5, 0.0, 0.0, 1.0, 0.0, 0.0, -0.3, 0.0, -0.75,
+            1.0, 0.5, 0.0, 0.0, 1.0, 0.0, 0.0, -0.3, 0.0, 0.25,
+            1.0, 0.5, 0.0, 0.0, 1.0, 0.0, 0.0, -0.3, 0.2, 0.25
+        };
+        glInterleavedArrays(GL_C4F_N3F_V3F, 0, verteces);
+        glDrawArrays(GL_QUADS, 0, 4);
     }
 
+    // Leva stena.
     {
-        // horni okraje
-        GLuint indices[] = {10, 4, 11, 5, 12, 6, 13, 7, 10, 4};
-        glDrawElements(GL_QUAD_STRIP, 10, GL_UNSIGNED_INT, indices);
+        GLfloat verteces[] = {
+            1.0, 0.5, 0.0, 0.0, -1.0, 0.0, 0.0, 0.3, 0.2, -0.75,
+            1.0, 0.5, 0.0, 0.0, -1.0, 0.0, 0.0, 0.3, 0.0, -0.75,
+            1.0, 0.5, 0.0, 0.0, -1.0, 0.0, 0.0, 0.3, 0.0, 0.25,
+            1.0, 0.5, 0.0, 0.0, -1.0, 0.0, 0.0, 0.3, 0.2, 0.25
+        };
+        glInterleavedArrays(GL_C4F_N3F_V3F, 0, verteces);
+        glDrawArrays(GL_QUADS, 0, 4);
     }
 
+    // Prava spicka.
     {
-        // spicka okraje
-        GLuint indices[] = {4, 0, 9, 8, 7, 3};
-        glDrawElements(GL_QUAD_STRIP, 6, GL_UNSIGNED_INT, indices);
+        GLfloat verteces[] = {
+            0.0, 0.5, 0.5, 0.0, 1.0, 0.0, 0.6, -0.3, 0.2, 0.25,
+            0.0, 0.5, 0.5, 0.0, 1.0, 0.0, 0.6, -0.3, 0.0, 0.25,
+            0.0, 0.5, 0.5, 0.0, 1.0, 0.0, 0.6, 0.0, 0.0, 0.75,
+            0.0, 0.5, 0.5, 0.0, 1.0, 0.0, 0.6, 0.0, 0.2, 0.75
+        };
+        glInterleavedArrays(GL_C4F_N3F_V3F, 0, verteces);
+        glDrawArrays(GL_QUADS, 0, 4);
     }
 
+    // Leva spicka.
     {
-        // spicka spodek
-        GLuint indices[] = {0, 8, 3};
-        glDrawElements(GL_TRIANGLES, 4, GL_UNSIGNED_INT, indices);
+        GLfloat verteces[] = {
+            0.5, 0.0, 0.5, 0.0, -1.0, 0.0, 0.6, 0.3, 0.2, 0.25,
+            0.5, 0.0, 0.5, 0.0, -1.0, 0.0, 0.6, 0.3, 0.0, 0.25,
+            0.5, 0.0, 0.5, 0.0, -1.0, 0.0, 0.6, 0.0, 0.0, 0.75,
+            0.5, 0.0, 0.5, 0.0, -1.0, 0.0, 0.6, 0.0, 0.2, 0.75
+        };
+        glInterleavedArrays(GL_C4F_N3F_V3F, 0, verteces);
+        glDrawArrays(GL_QUADS, 0, 4);
     }
 
+    // Vnitrni zadni stena.
     {
-        // spicka vrsek
-        GLuint indices[] = {4, 9, 7};
-        glDrawElements(GL_TRIANGLES, 4, GL_UNSIGNED_INT, indices);
+        GLfloat verteces[] = {
+            0.5, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, -0.25, 0.2, -0.7,
+            0.5, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, -0.25, 0.05, -0.7,
+            0.5, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.25, 0.05, -0.7,
+            0.5, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.25, 0.2, -0.7
+        };
+        glInterleavedArrays(GL_C4F_N3F_V3F, 0, verteces);
+        glDrawArrays(GL_QUADS, 0, 4);
+    }
+
+    // Vnitrni prava stena.
+    {
+        GLfloat verteces[] = {
+            0.0, 0.5, 0.3, 0.0, -1.0, 0.0, 0.0, -0.25, 0.2, -0.7,
+            0.0, 0.5, 0.3, 0.0, -1.0, 0.0, 0.0, -0.25, 0.05, -0.7,
+            0.0, 0.5, 0.3, 0.0, -1.0, 0.0, 0.0, -0.25, 0.05, 0.2,
+            0.0, 0.5, 0.3, 0.0, -1.0, 0.0, 0.0, -0.25, 0.2, 0.2
+        };
+        glInterleavedArrays(GL_C4F_N3F_V3F, 0, verteces);
+        glDrawArrays(GL_QUADS, 0, 4);
+    }
+
+    // Vnitrni leva stena.
+    {
+        GLfloat verteces[] = {
+            0.0, 0.5, 0.3, 0.0, 1.0, 0.0, 0.0, 0.25, 0.2, -0.7,
+            0.0, 0.5, 0.3, 0.0, 1.0, 0.0, 0.0, 0.25, 0.05, -0.7,
+            0.0, 0.5, 0.3, 0.0, 1.0, 0.0, 0.0, 0.25, 0.05, 0.2,
+            0.0, 0.5, 0.3, 0.0, 1.0, 0.0, 0.0, 0.25, 0.2, 0.2
+        };
+        glInterleavedArrays(GL_C4F_N3F_V3F, 0, verteces);
+        glDrawArrays(GL_QUADS, 0, 4);
+    }
+
+    // Vnitrni dno.
+    {
+        GLfloat verteces[] = {
+            0.5, 0.5, 0.3, 0.0, 0.0, 1.0, 0.0, -0.25, 0.05, -0.7,
+            0.5, 0.5, 0.3, 0.0, 0.0, 1.0, 0.0, 0.25, 0.05, -0.7,
+            0.5, 0.5, 0.3, 0.0, 0.0, 1.0, 0.0, 0.25, 0.05, 0.2,
+            0.5, 0.5, 0.3, 0.0, 0.0, 1.0, 0.0, -0.25, 0.05, 0.2
+        };
+        glInterleavedArrays(GL_C4F_N3F_V3F, 0, verteces);
+        glDrawArrays(GL_QUADS, 0, 4);
+    }
+
+    // Predni stena vnitrku.
+    {
+        GLfloat verteces[] = {
+            0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, -0.25, 0.2, 0.2,
+            0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, -0.25, 0.05, 0.2,
+            0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.25, 0.05, 0.2,
+            0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.25, 0.2, 0.2
+        };
+        glInterleavedArrays(GL_C4F_N3F_V3F, 0, verteces);
+        glDrawArrays(GL_QUADS, 0, 4);
+    }
+
+    // Vrchni plocha vzadu.
+    {
+        GLfloat verteces[] = {
+            0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, -0.3, 0.2, -0.75,
+            0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.3, 0.2, -0.75,
+            0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.25, 0.2, -0.70,
+            0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, -0.25, 0.2, -0.70
+        };
+        glInterleavedArrays(GL_C4F_N3F_V3F, 0, verteces);
+        glDrawArrays(GL_QUADS, 0, 4);
+    }
+
+    // Vrchni plocha vpravo.
+    {
+        GLfloat verteces[] = {
+            0.0, 0.3, 1.0, 0.0, 0.0, 1.0, 0.0, -0.25, 0.2, -0.7,
+            0.0, 0.3, 1.0, 0.0, 0.0, 1.0, 0.0, -0.25, 0.2, 0.2,
+            0.0, 0.3, 1.0, 0.0, 0.0, 1.0, 0.0, -0.3, 0.2, 0.25,
+            0.0, 0.3, 1.0, 0.0, 0.0, 1.0, 0.0, -0.3, 0.2, -0.75
+        };
+        glInterleavedArrays(GL_C4F_N3F_V3F, 0, verteces);
+        glDrawArrays(GL_QUADS, 0, 4);
+    }
+
+    // Vrchni plocha vlevo.
+    {
+        GLfloat verteces[] = {
+            0.0, 0.3, 1.0, 0.0, 0.0, 1.0, 0.0, 0.3, 0.2, -0.75,
+            0.0, 0.3, 1.0, 0.0, 0.0, 1.0, 0.0, 0.3, 0.2, 0.25,
+            0.0, 0.3, 1.0, 0.0, 0.0, 1.0, 0.0, 0.25, 0.2, 0.20,
+            0.0, 0.3, 1.0, 0.0, 0.0, 1.0, 0.0, 0.25, 0.2, -0.70
+        };
+        glInterleavedArrays(GL_C4F_N3F_V3F, 0, verteces);
+        glDrawArrays(GL_QUADS, 0, 4);
+    }
+
+    // Vrchni plocha vpredu.
+    {
+        GLfloat verteces[] = {
+            0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, -0.25, 0.2, 0.2,
+            0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, -0.3, 0.2, 0.25,
+            0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.3, 0.2, 0.25,
+            0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.25, 0.2, 0.2
+        };
+        glInterleavedArrays(GL_C4F_N3F_V3F, 0, verteces);
+        glDrawArrays(GL_QUADS, 0, 4);
+    }
+
+    // Vrchni plocha spicky.
+    {
+        GLfloat verteces[] = {
+            0.0, 0.5, 0.5, 0.0, 0.0, 1.0, 0.0, -0.3, 0.2, 0.25,
+            0.0, 0.5, 0.5, 0.0, 0.0, 1.0, 0.0, 0.3, 0.2, 0.25,
+            0.0, 0.5, 0.5, 0.0, 0.0, 1.0, 0.0, 0.0, 0.2, 0.75
+        };
+        glInterleavedArrays(GL_C4F_N3F_V3F, 0, verteces);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
     }
 
 
@@ -468,5 +612,10 @@ void Enviroment::drawShip(void) {
 
 
 
-    glEnable(GL_LIGHTING);
+
+
+
+
+    glDisable(GL_COLOR_MATERIAL);
+    //glEnable(GL_LIGHTING);
 }
