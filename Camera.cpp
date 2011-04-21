@@ -59,7 +59,7 @@ void Camera::look(void) {
 void Camera::lookStatic(void) {
     gluLookAt(
             position[0], position[1], position[2], // camera position
-            viewDirection[0], viewDirection[1], viewDirection[2], // view direction
+            position[0] + viewDirection[0], position[1] + viewDirection[1], position[2] + viewDirection[2], // view direction
             upvector[0], upvector[1], upvector[2] // upvector
             );
 }
@@ -77,6 +77,7 @@ void Camera::lookWalk(void) {
             position[0] + viewDirection[0], position[1] + viewDirection[1], position[2] + viewDirection[2], // view direction
             upvector[0], upvector[1], upvector[2] // upvector
             );
+
 }
 
 void Camera::lookFree(void) {

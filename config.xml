@@ -9,12 +9,12 @@
         <camera-0>
             <type>static</type>
             <position>
-                <x>0.98841</x>
+                <x>-0.556808</x>
                 <y>0.5</y>
-                <z>1.68559</z>
+                <z>1.08049</z>
             </position>
-            <rotation>240.0</rotation>
-            <elevation>0.0</elevation>
+            <rotation>-57.0</rotation>
+            <elevation>-15.0</elevation>
         </camera-0>
         <camera-1>
             <type>static</type>
