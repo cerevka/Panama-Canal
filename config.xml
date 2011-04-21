@@ -7,105 +7,45 @@
     </window>
     <cameras>
         <camera-0>
+            <type>static</type>
             <position>
                 <x>0.98841</x>
                 <y>0.5</y>
                 <z>1.68559</z>
             </position>
-            <direction>
-                <x>-0.453367</x>
-                <y>0.0523359</y>
-                <z>-0.889786</z>
-            </direction>
-            <upvector>
-                <x>0.0237599</x>
-                <y>0.99863</y>
-                <z>0.0466317</z>
-            </upvector>
             <rotation>240.0</rotation>
-            <elevation>4.0</elevation>
-            <motion>
-                <step>0.0</step>
-                <angle>
-                    <rotation-step>0.0</rotation-step>
-                    <elevation-step>0.0</elevation-step>
-                </angle>
-            </motion>
+            <elevation>0.0</elevation>
         </camera-0>
         <camera-1>
+            <type>static</type>
             <position>
                 <x>-1.36783</x>
                 <y>0.5</y>
                 <z> 4.47239</z>
-            </position>
-            <direction>
-                <x>0.309018</x>
-                <y>0.0</y>
-                <z>-0.951056</z>
-            </direction>
-            <upvector>
-                <x>0.0</x>
-                <y>1.0</y>
-                <z>0.0</z>
-            </upvector>
+            </position>            
             <rotation>-72.0</rotation>
-            <elevation>0.0</elevation>
-            <motion>
-                <step>0.0</step>
-                <angle>
-                    <rotation-step>0.0</rotation-step>
-                    <elevation-step>0.0</elevation-step>		
-                </angle>
-            </motion>
+            <elevation>0.0</elevation>            
         </camera-1>
         <camera-2>
+            <type>static</type>
             <position>
                 <x>-4.5</x>
                 <y>0.5</y>
                 <z>0.0</z>
-            </position>
-            <direction>
-                <x>1.0</x>
-                <y>0.0</y>
-                <z>0.0</z>
-            </direction>
-            <upvector>
-                <x>0.0</x>
-                <y>1.0</y>
-                <z>0.0</z>
-            </upvector>
+            </position>            
             <rotation>0.0</rotation>
-            <elevation>0.0</elevation>
-            <motion>
-                <step>0.0</step>
-                <angle>
-                    <rotation-step>0.0</rotation-step>
-                    <elevation-step>0.0</elevation-step>
-                </angle>
-            </motion>
+            <elevation>0.0</elevation>            
         </camera-2>
         <camera-3>
+            <type>walk</type>
             <position>
                 <x>-3.0</x>
                 <y>0.5</y>
                 <z>0.0</z>
-            </position>
-            <direction>
-                <x>0.0</x>
-                <y>0.0</y>
-                <z>0.0</z>
-            </direction>
-            <upvector>
-                <x>0.0</x>
-                <y>1.0</y>
-                <z>0.0</z>
-            </upvector>
+            </position>            
             <rotation>0.0</rotation>
             <elevation>0.0</elevation>
             <motion>
-                <x>0.0</x>
-                <y>0.0</y>
-                <z>-1.0</z>
                 <step>0.2</step>
                 <angle>
                     <rotation-step>3.0</rotation-step>
@@ -114,27 +54,15 @@
             </motion>
         </camera-3>
         <camera-4>
+            <type>free</type>
             <position>
                 <x>-3.0</x>
                 <y>0.5</y>
                 <z>0.0</z>
-            </position>
-            <direction>
-                <x>0.0</x>
-                <y>0.0</y>
-                <z>0.0</z>
-            </direction>
-            <upvector>
-                <x>0.0</x>
-                <y>1.0</y>
-                <z>0.0</z>
-            </upvector>
+            </position>            
             <rotation>0.0</rotation>
             <elevation>0.0</elevation>
             <motion>
-                <x>0.0</x>
-                <y>0.0</y>
-                <z>-1.0</z>
                 <step>0.2</step>
                 <angle>
                     <rotation-step>3.0</rotation-step>

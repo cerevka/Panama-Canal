@@ -166,29 +166,29 @@ void Enviroment::menu(int _selectedItem) {
             exit(0);
             break;
         case 11:
-            // Staticky pohled 1.
+            // Static view 1.
             enviroment->camera = enviroment->cameras[0];
             break;
         case 12:
-            // Staticky pohled 2.
+            // Static view 2.
             enviroment->camera = enviroment->cameras[1];
             break;
         case 13:
-            // Dynamicky pohled.
+            // Dynamic view.
             enviroment->camera = enviroment->cameras[2];
             break;
         case 14:
-            // Chodici kamera.
+            // Walking camera.
             enviroment->cameras[3]->loadConfig(enviroment->camera);
             enviroment->camera = enviroment->cameras[3];
             break;
         case 15:
-            // Volna kamera.
+            // Free camera.
             enviroment->cameras[4]->loadConfig(enviroment->camera);
             enviroment->camera = enviroment->cameras[4];
             break;
         case 21:
-            // Zapinani a vypinani slunce.
+            // Switch on/off the sun.
             if (enviroment->lights[0]->getState() == true) {
                 enviroment->lights[0]->switchOff();
             } else {
@@ -196,7 +196,7 @@ void Enviroment::menu(int _selectedItem) {
             }
             break;
         case 22:
-            // Ovladani baterky.
+            // Control of flashlight.
             if (enviroment->lights[1]->getState() == true) {
                 enviroment->lights[1]->switchOff();
             } else {
@@ -217,37 +217,47 @@ float Enviroment::RadToDeg(float _rad) {
 void Enviroment::init(void) {
     glEnable(GL_DEPTH_TEST);
 
-    // Predni strany polygonu jsou vyplneny, zadni strany maji jen obrysy.
+    // Front side of polygons are filled, back side as well.
     glPolygonMode(GL_FRONT, GL_FILL);
     glPolygonMode(GL_BACK, GL_FILL);
 
-    // Zahazuji se zadni strany polygony.
-    //glCullFace(GL_BACK);
+    // Culling of back side of polygon.
+    glCullFace(GL_BACK);
 
-    // Vytvori kamery.
+    initCameras();
+    initLights();
+}
+
+void Enviroment::initCameras(void) {
+    // Create cameras.
     for (int i = 0; i < CAMERA_COUNT; ++i) {
         try {
             string name = lexical_cast<string > (i);
             cameras[i] = new Camera(name, config);
         } catch (bad_lexical_cast exception) {
-            cerr << "Enviroment::constructor -> Bad Lexical Cast." << endl;
+            cerr << "Environment::constructor -> Bad Lexical Cast." << endl;
             exit(1);
         }
     }
-    // Nastavi se aktualni kamera.
-    camera = cameras[3];
 
-    // Zapnuti osvetleni.
+    // Set up the actual camera.
+    camera = cameras[3];
+}
+
+void Enviroment::initLights(void) {
+    // Set up lighting.
     glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
     glEnable(GL_LIGHTING);
     glShadeModel(GL_SMOOTH);
+
+    // Create lights.
     for (int i = 0; i < LIGHT_COUNT; ++i) {
         lights[i] = new Light(i, config);
     }
 }
 
 void Enviroment::createMenu(void) {
-    // Vytvoreni podmenicek.
+    // Create submenus.
     int cameraMenu = glutCreateMenu(Enviroment::menu);
     glutAddMenuEntry("Static view 1", 11);
     glutAddMenuEntry("Static view 2", 12);
@@ -259,13 +269,13 @@ void Enviroment::createMenu(void) {
     glutAddMenuEntry("Switch on/off sun", 21);
     glutAddMenuEntry("Switch on/off flashlight", 22);
 
-    // Vytvoreni hlavniho menu.
+    // Create main menu.
     glutCreateMenu(Enviroment::menu);
     glutAddSubMenu("Camera", cameraMenu);
     glutAddSubMenu("Lights", lightMenu);
     glutAddMenuEntry("Quit", 0);
 
-    // Menu se bude otevirat pravym mysitkem.
+    // Right button opens main menu.
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
 
@@ -276,7 +286,7 @@ void Enviroment::drawScene(void) {
     glLoadIdentity();
     enviroment->camera->look();
 
-    //cout << *camera;
+    cout << *camera;
 
     // Repozicuji se staticka svetla.
     for (int i = 0; i < LIGHT_COUNT; ++i) {
@@ -291,18 +301,9 @@ void Enviroment::drawScene(void) {
     drawPlane(100);
     glPopMatrix();
 
-    // Nakresli cajnik.
+    // Nakresli lod.
     glPushMatrix();
     glTranslated(0.0, 0.0, 0.0);
-    GLfloat ambient[] = {0.4, 0.4, 0.4, 1.0f};
-    glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
-    GLfloat diffuse[] = {0.8, 0.8, 0.8, 1.0};
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
-    GLfloat specular[] = {1.0, 1.0, 1.0, 1.0};
-    glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
-    glMaterialf(GL_FRONT, GL_SHININESS, 100.0);
-
-    //glutSolidTeapot(0.5);
     drawShip();
     drawAxes(2.0);
     glPopMatrix();
@@ -396,10 +397,17 @@ void Enviroment::drawPlane(int subdiv) {
     }
 }
 
-void Enviroment::drawShip(void) {
-    //glDisable(GL_LIGHTING);
+void Enviroment::drawShip(void) {   
     glEnable(GL_COLOR_MATERIAL);
     glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+
+    GLfloat ambient[] = {0.4, 0.4, 0.4, 1.0f};
+    glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
+    GLfloat diffuse[] = {0.8, 0.8, 0.8, 1.0};
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
+    GLfloat specular[] = {1.0, 1.0, 1.0, 1.0};
+    glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
+    glMaterialf(GL_FRONT, GL_SHININESS, 100.0);
 
     glEnableClientState(GL_COLOR_ARRAY);
     glEnableClientState(GL_VERTEX_ARRAY);
@@ -607,15 +615,5 @@ void Enviroment::drawShip(void) {
         glDrawArrays(GL_TRIANGLES, 0, 3);
     }
 
-
-
-
-
-
-
-
-
-
-    glDisable(GL_COLOR_MATERIAL);
-    //glEnable(GL_LIGHTING);
+    glDisable(GL_COLOR_MATERIAL);    
 }

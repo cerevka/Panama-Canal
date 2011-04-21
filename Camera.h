@@ -13,156 +13,163 @@ using namespace boost::property_tree;
 
 class Camera {
 public:
-    /** Ruzne typy kamer. */
-    enum typeEnum {STATIC, WALK, FREE};
+    /** Camera types. */
+    enum typeEnum {STATIC, WALK, FREE};    
 
-    /** Velikost kroku kamery. */
+    /** Size of camera step. */
     float step;
 
-    /** Velikost uhlu rotace. */
+    /** Size of rotation angle step. */
     float rotationAngleStep;
 
-    /** Velikost uhlu naklonu. */
+    /** Size of elevation angle step. */
     float elevationAngleStep;
 
-    /** Aktualni uhel rotace v horizontalni poloze. */
+    /** Actual size of rotation angle. */
     float rotationAngle;
 
-    /** Aktualni uhel rotace ve vertikalni poloze. */
+    /** Actual size of elevation angle. */
     float elevationAngle;
 
     /**
-     * Vytvori novou kameru.
+     * Create new camera.
+     * @param _name Camera name.
+     * @param _config Configuration.
      */
     Camera(const string& _name, ptree& _config);
 
     /**
-     * Znici kameru.
+     * Destroy camera.
      */
     virtual ~Camera(void);
 
     /**
-     * Nastavi pozici kamery.
-     * @param GLfloat x Xova souradnice.
-     * @param GLfloat y Yova souradnice.
-     * @param GLfloat z Zova souradnice.
+     * Set up camera position.
+     * @param _x X coordination.
+     * @param _y Y coordination.
+     * @param _z Z coordination.
      */
     void setPosition(GLfloat _x, GLfloat _y, GLfloat _z);
 
     /**
-     * Vrati souradnice kamery.
-     * @return
+     * Get camera position.
+     * @return Camera position.
      */
     GLfloat* getPosition(void);
 
     /**
-     * Nastavi smer kamery.
-     * @param GLfloat x Xova souradnice.
-     * @param GLfloat y Yova souradnice.
-     * @param GLfloat z Zova souradnice.
+     * Set up view direction.
+     * @param _x X coordination.
+     * @param _y Y coordination.
+     * @param _z Z coordination.
      */
     void setViewDirection(GLfloat _x, GLfloat _y, GLfloat _z);
 
     /**
-     * Nastavi upvector kamery.
-     * @param GLfloat x Xova souradnice.
-     * @param GLfloat y Yova souradnice.
-     * @param GLfloat z Zova souradnice.
+     * Set up upvector.
+     * @param _x X coordination.
+     * @param _y Y coordination.
+     * @param _z Z coordination.
      */
     void setUpvector(GLfloat _x, GLfloat _y, GLfloat _z);
 
     /**
-     * Nastavni souradnice smeru pohybu.
-     * @param GLfloat x Xova souradnice.
-     * @param GLfloat y Yova souradnice.
-     * @param GLfloat z Zova souradnice.
+     * Set up motion direction.
+     * @param _x X coordination.
+     * @param _y Y coordination.
+     * @param _z Z coordination.
      */
     void setMotionDirection(GLfloat _x, GLfloat _y, GLfloat _z);
 
     /**
-     * Umisti kameru.
+     * Place camera.
      */
     void look(void);
 
     /**
-     * Pootoci kameru doleva.
+     * Turn camera left.
      */
     void turnLeft(void);
 
     /**
-     * Pootoci kameru doprava.
+     * Turn camera right.
      */
     void turnRight(void);
 
     /**
-     * Zvedne kameru.
+     * Pick up camera view.
      */
     void turnUp(void);
 
     /**
-     * Snizi kameru.
+     * Put down camera view.
      */
     void turnDown(void);
 
     /**
-     * Posune kameru dopredu.
+     * Move camera forward.
      */
     void stepForward(void);
 
     /**
-     * Posune kameru dozadu.
+     * Move camera back.
      */
     void stepBackward(void);
 
     /**
-     * Nastavi se dle nastaveni jine kamery.
-     * @param camera
+     * Set up camera according to the given camera.
+     * @param camera Given camera.
      */
     void loadConfig(const Camera* camera);
 
     /**
-     * Nastavi typ kamery.
-     * @param type Typ kamery.
+     * Set camera type.
+     * @param type Camera type.
      */
     void setType(typeEnum _type);
 
     /**
-     * Vypise konfiguraci kamery na vystup.
-     * @param ostream& os Vystupni stream.
-     * @param Camera& camera Vypisovany objekt.
-     * @return ostream& Vystupni stream.
+     * Write out information about camera.
+     * @param _os Output stream.
+     * @param _camera Described camera.
+     * @return Output stream.
      */
-    friend ostream& operator<<(ostream& os, Camera& camera);
+    friend ostream& operator<<(ostream& _os, Camera& _camera);
 
 private:
-    /** Pozice x, y, z kamery. */
+    /** Camera position. */
     GLfloat position[3];
 
-    /** Smer x, y, z, kam se kamera diva. */
+    /** View direction. */
     GLfloat viewDirection[3];
 
-    /** Up-vektor kamery. */
+    /** Upvector. */
     GLfloat upvector[3];
 
-    /** Smer pohybu kamery. */
+    /** Motion direction. */
     GLfloat motionDirection[3];
 
+    /**
+     * Load camera configuration.
+     * @param _name Name of camera.
+     * @param _config Configuration.
+     */
     void loadConfig(const string& _name, ptree& _config);
 
     void (Camera::*lookFce)(void);
 
     /**
-     * Umisti statickou kameru.
+     * Place static camera.
      */
     void lookStatic(void);
 
     /**
-     * Umisti chodici kameru kameru.
+     * Place walking camera.
      */
     void lookWalk(void);
 
     /**
-     * Umisti volnou kameru.
+     * Place free camera.
      */
     void lookFree(void);
 };

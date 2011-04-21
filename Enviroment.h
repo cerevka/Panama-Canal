@@ -133,6 +133,16 @@ public:
     void init(void);
 
     /**
+     * Inicializuje kamery.
+     */
+    void initCameras(void);
+
+    /**
+     * Inicializuje svetla.
+     */
+    void initLights(void);
+
+    /**
      * Vytvori menu.
      */
     void createMenu(void);
