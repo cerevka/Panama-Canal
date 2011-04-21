@@ -124,7 +124,7 @@ bool Light::getState(void) {
 void Light::loadConfig(const string& _name, ptree& _config) {
     string path = "config.lights.light-" + _name + ".";    
     try {
-        // Nastavi se promenne svetlu.
+        // Set up variables of light.
         dynamic = _config.get<bool>(path + "dynamic");
         enabled = _config.get<bool>(path + "enabled");
         if (enabled == true) {

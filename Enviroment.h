@@ -23,185 +23,188 @@ using namespace boost::property_tree;
 #define LIGHT_COUNT 2
 
 /**
- * Trida starajici se o prostredi OpenGL. Singleton.
+ * Look after environment of OpenGL.
  */
-class Enviroment {
+class Environment {
 public:
+    /** Actual angle of dynamic camera. */
+    static float dynamicViewAngle;
 
     /**
-     * Sirka okna.
+     * Window width.
      */
     int windowWidth;
 
     /**
-     * Vyska okna.
+     * Window height.
      */
     int windowHeight;
 
     /**
-     * Titulek okna.
+     * Window title.
      */
-    string windowTitle;
-
-    float dynamicViewAngle;
+    string windowTitle;    
 
     /**
-     * Destruuje Enviroment.
+     * Destroy environment.
      */
-    virtual ~Enviroment(void);
+    virtual ~Environment(void);
 
     /**
-     * Vrati instanci prostredi.
-     * @return Enviroment Instance Enviroment.
+     * Return instance of the singleton object.
+     * @return Instance Environment.
      */
-    static Enviroment * getInstance(void);
+    static Environment * getInstance(void);
 
     /**
-     * Kresli obsah hlavniho okna.
+     * Draw content of main window.
      * Callback pro GLUT.
      */
     static void display(void);
 
     /**
-     * Meni velikost okna.
-     * Callback pro GLUT volany pri zmene velikosti okna.
-     * @param _width Sirka okna.
-     * @param _height Vyska okna.
+     * Reshape main windows.
+     * Callback for Glut for resizing window.
+     * @param _width Window width.
+     * @param _height Window height.
      */
     static void reshape(int _width, int _height);
 
     /**
-     * Odchytava stisky klavesy.
-     * @param  char key Kod klavesy.
-     * @param _x Xova souradnice mysi.
-     * @param _y Yova souradnice mysi.
+     * Catch inputs of keyboard.
+     * @param key Key code.
+     * @param _x X coordinate of mouse.
+     * @param _y Y coordinate of mouse.
      */
     static void keyboard(unsigned char _key, int _x, int _y);
 
     /**
-     * Odchytava stisky specialnich klaves.
-     * @param _key Kod klavesy.
-     * @param _x Xova souradnice mysi.
-     * @param _y Yova souradnice mysi.
+     * Catch inputs of special keys.
+     * @param _key Key code.
+     * @param _x X coordinate of mouse.
+     * @param _y Y coordinate of mouse.
      */
     static void specialKeyboard(int _key, int _x, int _y);
 
     /**
-     * Odchytava klikani mysi.
-     * @param _button Identifikator tlacitka.
-     * @param _state Identifikator stavu tlacitka.
-     * @param _x Xova souradnice.
-     * @param _y Yova souradnice.
+     * Catch inputs of mouse.
+     * @param _button Button identifier.
+     * @param _state State identifier.
+     * @param _x X coordinate.
+     * @param _y Y coordinate.
      */
     static void mouse(int _button, int _state, int _x, int _y);
 
     /**
-     * Odchytava pohyb mysi.
-     * @param _x Xova souradnice.
-     * @param _y Yova souradnice.
+     * Catch move of mouse.
+     * @param _x X coordinate.
+     * @param _y Y coordinate.
      */
     static void mouseMotion(int _x, int _y);
 
     /**
-     * Vola se, pokud se zrovna nic jineho nedeje.
+     * It is called, when there is nothing to call.
      */
     static void idle(void);
 
     /**
-     * Ovlada kontextova menu.
-     * @param _selectedItem ID zvolene polozky.s
+     * Control context menu.
+     * @param _selectedItem Menu item identifier.
      */
     static void menu(int _selectedItem);
 
     /**
-     * Prevadi stupne na radiany.
-     * @param _deg Stupne.
-     * @return Radiany.
+     * Convert degrees to radians.
+     * @param _deg Degrees.
+     * @return Radians.
      */
     static float DegToRad(float _deg);
 
     /**
-     * Prevadi radiany na stupne.
-     * @param _rad Radiany.
-     * @return Stupne.
+     * Convert radians to degrees.
+     * @param _rad Radians.
+     * @return Degrees.
      */
     static float RadToDeg(float _rad);
 
     /**
-     * Inicializuje OpenGL.
+     * Initialize OpenGL.
      */
     void init(void);
 
     /**
-     * Inicializuje kamery.
+     * Initialize cameras.
      */
     void initCameras(void);
 
     /**
-     * Inicializuje svetla.
+     * Initialize lights.
      */
     void initLights(void);
 
     /**
-     * Vytvori menu.
+     * Create context menu.
      */
     void createMenu(void);
 
     /**
-     * Kresli scenu.
+     * Draw scene.
      */
     void drawScene(void);
 
     /**
-     * Vykresli osy x, y, z.
-     * @param _length Delka os.
+     * Draw x, y and z axes.
+     * @param _length Length of axes.
      */
     void drawAxes(float _length);
 
 private:
 
-    /** Instance prostredi.  */
-    static Enviroment * instance;
+    /** Object instance.  */
+    static Environment * instance;
 
-    /** Nastaveni. */
+    /** Configuration. */
     ptree config;
 
-    /** Pouzivana kamera. */
+    /** Actual camera. */
     Camera* camera;
 
-    /** Kamery k dispozici. */
+    /** All cameras. */
     Camera* cameras[CAMERA_COUNT];
 
-    /** Svetla. */
+    /** All lights. */
     Light* lights[LIGHT_COUNT];
 
+    /** Actual angle of sun. */
     float sunAngle;
 
+    /** Indicator of left mouse press. */
     bool mouseLeftPressed;
 
+    /** Last coordinates of mouse. */
     int lastCoordinate[2];
 
     /**
-     * Soukromy konstruktor - singleton.
+     * Private constructor - singleton.
      */
-    Enviroment(void);
+    Environment(void);
 
     /**
-     * Nacte nastaveni z daneho souboru.
+     * Load configuration from XML file.
      * @param _file
      */
     void loadConfig(const string& _file);
 
     /**
-     * Kresli zeleny podklad.
-     * @param _subdiv Pocet casti.
+     * Draw green plane.
+     * @param _subdiv Count of squares.
      */
     void drawPlane(int _subdiv);
 
     /**
-     * Kresli lod.
+     * Draw boat.
      */
-    void drawShip(void);
+    void drawBoat(void);
 
 };
 

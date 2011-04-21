@@ -14,7 +14,7 @@ using namespace boost::property_tree;
 class Camera {
 public:
     /** Camera types. */
-    enum typeEnum {STATIC, WALK, FREE};    
+    enum typeEnum {STATIC, DYNAMIC, WALK, FREE};    
 
     /** Size of camera step. */
     float step;
@@ -45,9 +45,9 @@ public:
 
     /**
      * Set up camera position.
-     * @param _x X coordination.
-     * @param _y Y coordination.
-     * @param _z Z coordination.
+     * @param _x X coordinate.
+     * @param _y Y coordinate.
+     * @param _z Z coordinate.
      */
     void setPosition(GLfloat _x, GLfloat _y, GLfloat _z);
 
@@ -59,25 +59,25 @@ public:
 
     /**
      * Set up view direction.
-     * @param _x X coordination.
-     * @param _y Y coordination.
-     * @param _z Z coordination.
+     * @param _x X coordinate.
+     * @param _y Y coordinate.
+     * @param _z Z coordinate.
      */
     void setViewDirection(GLfloat _x, GLfloat _y, GLfloat _z);
 
     /**
      * Set up upvector.
-     * @param _x X coordination.
-     * @param _y Y coordination.
-     * @param _z Z coordination.
+     * @param _x X coordinate.
+     * @param _y Y coordinate.
+     * @param _z Z coordinate.
      */
     void setUpvector(GLfloat _x, GLfloat _y, GLfloat _z);
 
     /**
      * Set up motion direction.
-     * @param _x X coordination.
-     * @param _y Y coordination.
-     * @param _z Z coordination.
+     * @param _x X coordinate.
+     * @param _y Y coordinate.
+     * @param _z Z coordinate.
      */
     void setMotionDirection(GLfloat _x, GLfloat _y, GLfloat _z);
 
@@ -127,7 +127,13 @@ public:
      * @param type Camera type.
      */
     void setType(typeEnum _type);
-
+    
+    /**
+     * Get camera type.
+     * @return Camera type.
+     */
+    Camera::typeEnum getType(void);
+    
     /**
      * Write out information about camera.
      * @param _os Output stream.
@@ -148,6 +154,8 @@ private:
 
     /** Motion direction. */
     GLfloat motionDirection[3];
+    
+    typeEnum type;
 
     /**
      * Load camera configuration.
@@ -157,11 +165,16 @@ private:
     void loadConfig(const string& _name, ptree& _config);
 
     void (Camera::*lookFce)(void);
-
+    
     /**
      * Place static camera.
      */
     void lookStatic(void);
+    
+    /**
+     * Place dynamic camera.
+     */
+    void lookDynamic(void);
 
     /**
      * Place walking camera.

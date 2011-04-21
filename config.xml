@@ -1,4 +1,3 @@
-
 <config>
     <window>
         <width>500</width>
@@ -27,7 +26,7 @@
             <elevation>0.0</elevation>            
         </camera-1>
         <camera-2>
-            <type>static</type>
+            <type>dynamic</type>
             <position>
                 <x>-4.5</x>
                 <y>0.5</y>

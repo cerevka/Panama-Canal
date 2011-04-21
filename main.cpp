@@ -1,5 +1,5 @@
 /* 
- * Semestralni prace pro predmet Y36PGR (Programování grafiky).
+ * Semestral project for subject Y36PGR (Graphics programming).
  * Author: Tomas Cerevka
  *
  * Created on March 26, 2011, 2:10 PM
@@ -16,39 +16,39 @@
 using namespace std;
 
 /**
- * Vstupni bod programu.
- * @param argc Pocet argumentu.
- * @param argv Argumenty.
- * @return Navratova hodnota.
+ * Enter point.
+ * @param argc Count of arguments.
+ * @param argv Arguments.
+ * @return Return value.
  */
 int main(int argc, char** argv) {
-    Enviroment * enviroment = Enviroment::getInstance();   
+    Environment * environment = Environment::getInstance();   
 
-    /* Initialize the GLUT library. */
+    // Initialize the GLUT library.
     glutInit(&argc, argv);  
 
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
     glutInitWindowPosition(5, 5);
-    glutInitWindowSize(enviroment->windowWidth, enviroment->windowHeight);
+    glutInitWindowSize(environment->windowWidth, environment->windowHeight);
 
-    // Vytvoreni hlavniho okna a nastaveni callbacku.
-    glutCreateWindow(enviroment->windowTitle.c_str());
-    glutDisplayFunc(Enviroment::display);
-    glutReshapeFunc(Enviroment::reshape);
-    glutKeyboardFunc(Enviroment::keyboard);
-    glutSpecialFunc(Enviroment::specialKeyboard);
-    glutMouseFunc(Enviroment::mouse);
-    glutMotionFunc(Enviroment::mouseMotion);
-    glutIdleFunc(Enviroment::idle);
+    // Create main window and set up callbacks.
+    glutCreateWindow(environment->windowTitle.c_str());
+    glutDisplayFunc(Environment::display);
+    glutReshapeFunc(Environment::reshape);
+    glutKeyboardFunc(Environment::keyboard);
+    glutSpecialFunc(Environment::specialKeyboard);
+    glutMouseFunc(Environment::mouse);
+    glutMotionFunc(Environment::mouseMotion);
+    glutIdleFunc(Environment::idle);
     
-    enviroment->createMenu();
+    environment->createMenu();
 
-    enviroment->init();
+    environment->init();
 
-    // Spusti hlavni smycku.
+    // Start main loop.
     glutMainLoop();
 
-    delete enviroment;
+    delete environment;
 
     return 0;
 }

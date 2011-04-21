@@ -1,106 +1,105 @@
 #include "Enviroment.h"
 
-Enviroment * Enviroment::instance = NULL;
+Environment * Environment::instance = NULL;
+float Environment::dynamicViewAngle = 0.0;
 
-Enviroment::Enviroment(void) {
-    // Nacte konfiguraci do prostredi a do kamery.
+Environment::Environment(void) {
+    // Load configuration.
     loadConfig("config.xml");
 
-    // Ulozi si ukazatel na sebe sama.
     instance = this;
     mouseLeftPressed = false;
-    sunAngle = 90.0;
-    dynamicViewAngle = 0.0;
+    sunAngle = 90.0;    
 }
 
-Enviroment::~Enviroment(void) {
+Environment::~Environment(void) {
     delete camera;
 }
 
-Enviroment * Enviroment::getInstance(void) {
+Environment * Environment::getInstance(void) {
     if (instance == NULL) {
-        instance = new Enviroment();
+        instance = new Environment();
     }
     return instance;
 }
 
-void Enviroment::display(void) {
-    // Vycisti okno.
+void Environment::display(void) {
+    // Clear window.
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Zacatek kresleni sceny.
+    // Start draw scene.
     glMatrixMode(GL_MODELVIEW);
 
     glPushMatrix();
-    Enviroment::instance->drawScene();
+    Environment::instance->drawScene();
     glPopMatrix();
 
-    // Konec kresleni sceny.
+    // End draw scene.
 
-    // Prepne buffery (double buffering).
+    // Switch buffers (double buffering).
     glutSwapBuffers();
 }
 
-void Enviroment::reshape(int _width, int _height) {
-    // Nastaveni transformace viewportu.
+void Environment::reshape(int _width, int _height) {
+    // Set up viewport transformation.
     glViewport(0, 0, _width, _height);
 
-    // Nastavi projekcni transoformaci - perspektivni projekce.
+    // Set up perspective transformation - perspective projection.
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPerspective(60.0, (GLdouble) _width / _height, 0.1, 20.0);
 
-    // Nastavi modelovaci a zobrazovaci transofmrace na identitu.
+    // Set up model-view matrix to identity.
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 }
 
-void Enviroment::keyboard(unsigned char _key, int _x, int _y) {
-
+void Environment::keyboard(unsigned char _key, int _x, int _y) {
     switch (_key) {
-        case 'q': /* 'q' key pressed -> terminate application */
+        case 'q':
         case 'Q':
+            // Terminate application.
             exit(0);
             break;
     }
 }
 
-void Enviroment::specialKeyboard(int _key, int _x, int _y) {
-    Enviroment * enviroment = Enviroment::instance;
+void Environment::specialKeyboard(int _key, int _x, int _y) {
+    Environment * enviroment = Environment::instance;
     switch (_key) {
         case GLUT_KEY_RIGHT:
         {
-            // Kamera se natoci doleva.
+            // Camera turns left.
             enviroment->camera->turnLeft();
             break;
         }
         case GLUT_KEY_LEFT:
         {
-            // Kamera se natoci doprava.
+            // Camera turns right.
             enviroment->camera->turnRight();
             break;
         }
         case GLUT_KEY_UP:
         {
-            // Kamera se posune dopredu.
+            // Camera goes forward.
             enviroment->camera->stepForward();
             break;
         }
         case GLUT_KEY_DOWN:
         {
-            // Kamera se posune dozadu.
+            // Camera goes back.
             enviroment->camera->stepBackward();
             break;
         }
         case GLUT_KEY_PAGE_UP:
         {
-            // Kamera zvedne pohled.
+            // Camera picks up view.
             enviroment->camera->turnUp();
             break;
         }
         case GLUT_KEY_PAGE_DOWN:
         {
-            // Kamera skloni pohled.
+            // Camera puts down view. 
             enviroment->camera->turnDown();
             break;
         }
@@ -110,8 +109,8 @@ void Enviroment::specialKeyboard(int _key, int _x, int _y) {
     glutPostRedisplay();
 }
 
-void Enviroment::mouse(int _button, int _state, int _x, int _y) {
-    Enviroment * enviroment = Enviroment::instance;
+void Environment::mouse(int _button, int _state, int _x, int _y) {
+    Environment * enviroment = Environment::instance;
     if (_button == GLUT_LEFT_BUTTON) {
         if (_state == GLUT_DOWN) {
             enviroment->mouseLeftPressed = true;
@@ -124,8 +123,8 @@ void Enviroment::mouse(int _button, int _state, int _x, int _y) {
 
 }
 
-void Enviroment::mouseMotion(int _x, int _y) {
-    Enviroment* enviroment = Enviroment::instance;
+void Environment::mouseMotion(int _x, int _y) {
+    Environment* enviroment = Environment::instance;
     if (enviroment->mouseLeftPressed == true) {
         if (_x > enviroment->lastCoordinate[0]) {
             enviroment->camera->turnLeft();
@@ -144,8 +143,11 @@ void Enviroment::mouseMotion(int _x, int _y) {
     glutPostRedisplay();
 }
 
-void Enviroment::idle(void) {
-    Enviroment* enviroment = Enviroment::instance;
+void Environment::idle(void) {
+    Environment* enviroment = Environment::instance;
+    if (enviroment->camera->getType() == Camera::DYNAMIC) {
+        dynamicViewAngle += 0.3;
+    }
     /*
     if (enviroment->dynamicView == true) {
         enviroment->dynamicViewAngle += 0.3;
@@ -155,12 +157,12 @@ void Enviroment::idle(void) {
     }*/
     // TODO pohyb kamery
 
-    // Prekresluje.
+    // Redraw scene.
     glutPostRedisplay();
 }
 
-void Enviroment::menu(int _selectedItem) {
-    Enviroment* enviroment = Enviroment::instance;
+void Environment::menu(int _selectedItem) {
+    Environment* enviroment = Environment::instance;
     switch (_selectedItem) {
         case 0:
             exit(0);
@@ -206,15 +208,15 @@ void Enviroment::menu(int _selectedItem) {
     glutPostRedisplay();
 }
 
-float Enviroment::DegToRad(float _deg) {
+float Environment::DegToRad(float _deg) {
     return _deg * (M_PI / 180);
 }
 
-float Enviroment::RadToDeg(float _rad) {
+float Environment::RadToDeg(float _rad) {
     return _rad * (180 / M_PI);
 }
 
-void Enviroment::init(void) {
+void Environment::init(void) {
     glEnable(GL_DEPTH_TEST);
 
     // Front side of polygons are filled, back side as well.
@@ -228,7 +230,7 @@ void Enviroment::init(void) {
     initLights();
 }
 
-void Enviroment::initCameras(void) {
+void Environment::initCameras(void) {
     // Create cameras.
     for (int i = 0; i < CAMERA_COUNT; ++i) {
         try {
@@ -244,7 +246,7 @@ void Enviroment::initCameras(void) {
     camera = cameras[3];
 }
 
-void Enviroment::initLights(void) {
+void Environment::initLights(void) {
     // Set up lighting.
     glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
     glEnable(GL_LIGHTING);
@@ -256,21 +258,21 @@ void Enviroment::initLights(void) {
     }
 }
 
-void Enviroment::createMenu(void) {
+void Environment::createMenu(void) {
     // Create submenus.
-    int cameraMenu = glutCreateMenu(Enviroment::menu);
+    int cameraMenu = glutCreateMenu(Environment::menu);
     glutAddMenuEntry("Static view 1", 11);
     glutAddMenuEntry("Static view 2", 12);
     glutAddMenuEntry("Dynamic view", 13);
     glutAddMenuEntry("Walk", 14);
     glutAddMenuEntry("Free camera", 15);
 
-    int lightMenu = glutCreateMenu(Enviroment::menu);
+    int lightMenu = glutCreateMenu(Environment::menu);
     glutAddMenuEntry("Switch on/off sun", 21);
     glutAddMenuEntry("Switch on/off flashlight", 22);
 
     // Create main menu.
-    glutCreateMenu(Enviroment::menu);
+    glutCreateMenu(Environment::menu);
     glutAddSubMenu("Camera", cameraMenu);
     glutAddSubMenu("Lights", lightMenu);
     glutAddMenuEntry("Quit", 0);
@@ -279,16 +281,16 @@ void Enviroment::createMenu(void) {
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
 
-void Enviroment::drawScene(void) {
-
-    Enviroment * enviroment = Enviroment::instance;
-    // Nastavi pozici a orientaci kamery.
+void Environment::drawScene(void) {
+    Environment * enviroment = Environment::instance;    
     glLoadIdentity();
+    
+    // Set camera position and camera direction.
     enviroment->camera->look();
 
     cout << *camera;
 
-    // Repozicuji se staticka svetla.
+    // Replace static lights.
     for (int i = 0; i < LIGHT_COUNT; ++i) {
         if (lights[i]->dynamic == false) {
             lights[i]->rePosition();
@@ -296,37 +298,37 @@ void Enviroment::drawScene(void) {
         }
     }
 
-    // Nakresli se podklad.
+    // Draw green plane.
     glPushMatrix();
     drawPlane(100);
     glPopMatrix();
 
-    // Nakresli lod.
+    // Draw boat.
     glPushMatrix();
     glTranslated(0.0, 0.0, 0.0);
-    drawShip();
+    drawBoat();
     drawAxes(2.0);
     glPopMatrix();
 }
 
-void Enviroment::drawAxes(float _length) {
+void Environment::drawAxes(float _length) {
     glDisable(GL_LIGHTING);
 
-    // Nakresli osu x.
+    // Draw x axis.
     glColor3f(1.0, 0.0, 0.0);
     glBegin(GL_LINES);
     glVertex3f(0.0, 0.0, 0.0);
     glVertex3f(_length, 0.0, 0.0);
     glEnd();
 
-    // Nakresli osu y.
+    // Draw y axis.
     glColor3f(0.0, 1.0, 0.0);
     glBegin(GL_LINES);
     glVertex3f(0.0, 0.0, 0.0);
     glVertex3f(0.0, _length, 0.0);
     glEnd();
 
-    // Nakresli osu z.
+    // Draw z axis.
     glColor3f(0.0, 0.0, 1.0);
     glBegin(GL_LINES);
     glVertex3f(0.0, 0.0, 0.0);
@@ -336,33 +338,33 @@ void Enviroment::drawAxes(float _length) {
     glEnable(GL_LIGHTING);
 }
 
-void Enviroment::loadConfig(const string& _file) {
-    // Nacte se XML soubor.
+void Environment::loadConfig(const string& _file) {
+    // Load configuration from XML file.
     try {
         read_xml(_file, config);
 
-        // Nastavi se promenne prostredi.
+        // Set up environment variables.
         windowWidth = config.get<int>("config.window.width");
         windowHeight = config.get<int>("config.window.height");
         windowTitle = config.get<string > ("config.window.title");
     } catch (xml_parser_error exception) {
-        cerr << "Enviroment::loadConfig -> XML Parser Error." << endl;
+        cerr << "Environment::loadConfig -> XML Parser Error." << endl;
         exit(1);
     } catch (ptree_bad_path exception) {
-        cerr << "Enviroment::loadConfig -> PTree Bad Path." << endl;
+        cerr << "Environment::loadConfig -> PTree Bad Path." << endl;
         exit(1);
     } catch (ptree_bad_data exception) {
-        cerr << "Enviroment::loadConfig -> PTree Bad Data." << endl;
+        cerr << "Environment::loadConfig -> PTree Bad Data." << endl;
         exit(1);
     }
 }
 
 /**
- * Vykresli zeleny podklad jako mrizku.
- * @param subdiv Pocet casti.
+ * Draw plain as grid.
+ * @param subdiv Count of squares.
  */
-void Enviroment::drawPlane(int subdiv) {
-    const float size = 12; // plane size
+void Environment::drawPlane(int subdiv) {
+    const float size = 12; // Plane size.
 
     glNormal3f(0.0, 1.0, 0.0);
 
@@ -397,7 +399,7 @@ void Enviroment::drawPlane(int subdiv) {
     }
 }
 
-void Enviroment::drawShip(void) {   
+void Environment::drawBoat(void) {   
     glEnable(GL_COLOR_MATERIAL);
     glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 
@@ -413,7 +415,7 @@ void Enviroment::drawShip(void) {
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
 
-    // Dno.
+    // Bottom.
     {
         GLfloat verteces[] = {
             0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, -0.3, 0.0, -0.75,
@@ -425,7 +427,7 @@ void Enviroment::drawShip(void) {
         glDrawArrays(GL_QUADS, 0, 4);
     }
 
-    // Dno spicky.
+    // Bottom of head.
     {
         GLfloat verteces[] = {
             0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, -0.3, 0.0, 0.25,
@@ -436,7 +438,7 @@ void Enviroment::drawShip(void) {
         glDrawArrays(GL_TRIANGLES, 0, 3);
     }
 
-    // Zadni stena
+    // Back side.
     {
         GLfloat verteces[] = {
             1.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, -0.3, 0.2, -0.75,
@@ -448,7 +450,7 @@ void Enviroment::drawShip(void) {
         glDrawArrays(GL_QUADS, 0, 4);
     }
 
-    // Prava stena.
+    // Right side.
     {
         GLfloat verteces[] = {
             1.0, 0.5, 0.0, 0.0, 1.0, 0.0, 0.0, -0.3, 0.2, -0.75,
@@ -460,7 +462,7 @@ void Enviroment::drawShip(void) {
         glDrawArrays(GL_QUADS, 0, 4);
     }
 
-    // Leva stena.
+    // Left side.
     {
         GLfloat verteces[] = {
             1.0, 0.5, 0.0, 0.0, -1.0, 0.0, 0.0, 0.3, 0.2, -0.75,
@@ -472,7 +474,7 @@ void Enviroment::drawShip(void) {
         glDrawArrays(GL_QUADS, 0, 4);
     }
 
-    // Prava spicka.
+    // Right head.
     {
         GLfloat verteces[] = {
             0.0, 0.5, 0.5, 0.0, 1.0, 0.0, 0.6, -0.3, 0.2, 0.25,
@@ -484,7 +486,7 @@ void Enviroment::drawShip(void) {
         glDrawArrays(GL_QUADS, 0, 4);
     }
 
-    // Leva spicka.
+    // Left head.
     {
         GLfloat verteces[] = {
             0.5, 0.0, 0.5, 0.0, -1.0, 0.0, 0.6, 0.3, 0.2, 0.25,
@@ -496,7 +498,7 @@ void Enviroment::drawShip(void) {
         glDrawArrays(GL_QUADS, 0, 4);
     }
 
-    // Vnitrni zadni stena.
+    // Inner back side.
     {
         GLfloat verteces[] = {
             0.5, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, -0.25, 0.2, -0.7,
@@ -508,7 +510,7 @@ void Enviroment::drawShip(void) {
         glDrawArrays(GL_QUADS, 0, 4);
     }
 
-    // Vnitrni prava stena.
+    // Inner right side.
     {
         GLfloat verteces[] = {
             0.0, 0.5, 0.3, 0.0, -1.0, 0.0, 0.0, -0.25, 0.2, -0.7,
@@ -520,7 +522,7 @@ void Enviroment::drawShip(void) {
         glDrawArrays(GL_QUADS, 0, 4);
     }
 
-    // Vnitrni leva stena.
+    // Inner left side.
     {
         GLfloat verteces[] = {
             0.0, 0.5, 0.3, 0.0, 1.0, 0.0, 0.0, 0.25, 0.2, -0.7,
@@ -532,7 +534,7 @@ void Enviroment::drawShip(void) {
         glDrawArrays(GL_QUADS, 0, 4);
     }
 
-    // Vnitrni dno.
+    // Inner bottom.
     {
         GLfloat verteces[] = {
             0.5, 0.5, 0.3, 0.0, 0.0, 1.0, 0.0, -0.25, 0.05, -0.7,
@@ -544,7 +546,7 @@ void Enviroment::drawShip(void) {
         glDrawArrays(GL_QUADS, 0, 4);
     }
 
-    // Predni stena vnitrku.
+    // Inner front side.
     {
         GLfloat verteces[] = {
             0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, -0.25, 0.2, 0.2,
@@ -556,7 +558,7 @@ void Enviroment::drawShip(void) {
         glDrawArrays(GL_QUADS, 0, 4);
     }
 
-    // Vrchni plocha vzadu.
+    // Top back cover.
     {
         GLfloat verteces[] = {
             0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, -0.3, 0.2, -0.75,
@@ -568,7 +570,7 @@ void Enviroment::drawShip(void) {
         glDrawArrays(GL_QUADS, 0, 4);
     }
 
-    // Vrchni plocha vpravo.
+    // Top right cover.
     {
         GLfloat verteces[] = {
             0.0, 0.3, 1.0, 0.0, 0.0, 1.0, 0.0, -0.25, 0.2, -0.7,
@@ -580,7 +582,7 @@ void Enviroment::drawShip(void) {
         glDrawArrays(GL_QUADS, 0, 4);
     }
 
-    // Vrchni plocha vlevo.
+    // Top left cover.
     {
         GLfloat verteces[] = {
             0.0, 0.3, 1.0, 0.0, 0.0, 1.0, 0.0, 0.3, 0.2, -0.75,
@@ -592,7 +594,7 @@ void Enviroment::drawShip(void) {
         glDrawArrays(GL_QUADS, 0, 4);
     }
 
-    // Vrchni plocha vpredu.
+    // Top front cover.
     {
         GLfloat verteces[] = {
             0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, -0.25, 0.2, 0.2,
@@ -604,7 +606,7 @@ void Enviroment::drawShip(void) {
         glDrawArrays(GL_QUADS, 0, 4);
     }
 
-    // Vrchni plocha spicky.
+    // Top head cover.
     {
         GLfloat verteces[] = {
             0.0, 0.5, 0.5, 0.0, 0.0, 1.0, 0.0, -0.3, 0.2, 0.25,

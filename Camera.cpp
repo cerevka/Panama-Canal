@@ -39,18 +39,18 @@ void Camera::setMotionDirection(GLfloat _x, GLfloat _y, GLfloat _z) {
 }
 
 void Camera::look(void) {
-    // Calculate direction coordinations.
+    // Calculate direction coordinates.
     setViewDirection(
-            cos(Enviroment::DegToRad(rotationAngle)) * cos(Enviroment::DegToRad(elevationAngle)),
-            sin(Enviroment::DegToRad(elevationAngle)),
-            sin(Enviroment::DegToRad(rotationAngle)) * cos(Enviroment::DegToRad(elevationAngle))
+            cos(Environment::DegToRad(rotationAngle)) * cos(Environment::DegToRad(elevationAngle)),
+            sin(Environment::DegToRad(elevationAngle)),
+            sin(Environment::DegToRad(rotationAngle)) * cos(Environment::DegToRad(elevationAngle))
             );
 
-    // Calculate upvector coordination.
+    // Calculate upvector coordinates.
     setUpvector(
-            -cos(Enviroment::DegToRad(rotationAngle)) * sin(Enviroment::DegToRad(elevationAngle)),
-            cos(Enviroment::DegToRad(elevationAngle)),
-            -sin(Enviroment::DegToRad(rotationAngle)) * sin(Enviroment::DegToRad(elevationAngle))
+            -cos(Environment::DegToRad(rotationAngle)) * sin(Environment::DegToRad(elevationAngle)),
+            cos(Environment::DegToRad(elevationAngle)),
+            -sin(Environment::DegToRad(rotationAngle)) * sin(Environment::DegToRad(elevationAngle))
             );
 
     (this->*lookFce)();
@@ -64,12 +64,24 @@ void Camera::lookStatic(void) {
             );
 }
 
+void Camera::lookDynamic(void) {
+    setPosition(cos(Environment::DegToRad(Environment::dynamicViewAngle)) * 5, 5, sin(Environment::DegToRad(Environment::dynamicViewAngle) * 5));
+    setViewDirection(0.0, 0.0, 0.0);
+    gluLookAt(
+            position[0], position[1], position[2], // camera position
+            viewDirection[0], viewDirection[1], viewDirection[2], // view direction
+            upvector[0], upvector[1], upvector[2] // upvector
+            );
+}
+
 void Camera::lookWalk(void) {
-    // Calculate motion coordinations.
+    position[1] = 0.5;
+
+    // Calculate motion coordinates.
     setMotionDirection(
-            cos(Enviroment::DegToRad(rotationAngle)),
+            cos(Environment::DegToRad(rotationAngle)),
             0.0,
-            sin(Enviroment::DegToRad(rotationAngle))
+            sin(Environment::DegToRad(rotationAngle))
             );
 
     gluLookAt(
@@ -81,11 +93,11 @@ void Camera::lookWalk(void) {
 }
 
 void Camera::lookFree(void) {
-    // Calculate motion coordinations.
+    // Calculate motion coordinates.
     setMotionDirection(
-            cos(Enviroment::DegToRad(rotationAngle)),
-            sin(Enviroment::DegToRad(elevationAngle)),
-            sin(Enviroment::DegToRad(rotationAngle))
+            cos(Environment::DegToRad(rotationAngle)),
+            sin(Environment::DegToRad(elevationAngle)),
+            sin(Environment::DegToRad(rotationAngle))
             );
 
     gluLookAt(
@@ -156,6 +168,9 @@ void Camera::loadConfig(const string& _name, ptree& _config) {
         if (type == "static") {
             // Static camera which can not move by keyboard or mouse.
             setType(STATIC);
+        } else if (type == "dynamic") {
+            // Dynamic camera with own motion function.
+            setType(DYNAMIC);
         } else if (type == "walk") {
             // Dynamic camera which emulate walking - only in xz plain.
             setType(WALK);
@@ -185,6 +200,9 @@ void Camera::setType(typeEnum _type) {
         case STATIC:
             lookFce = &Camera::lookStatic;
             break;
+        case DYNAMIC:
+            lookFce = &Camera::lookDynamic;
+            break;
         case WALK:
             lookFce = &Camera::lookWalk;
             break;
@@ -192,6 +210,11 @@ void Camera::setType(typeEnum _type) {
             lookFce = &Camera::lookFree;
             break;
     }
+    type = _type;
+}
+
+Camera::typeEnum Camera::getType(void) {
+    return type;
 }
 
 ostream & operator<<(ostream& _os, Camera& _camera) {

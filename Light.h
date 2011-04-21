@@ -16,106 +16,106 @@ using namespace boost::property_tree;
 
 class Light {
 public:
-    /** Indikace pohybujiciho se svetla. */
+    /** Indicator of movable light. */
     bool dynamic;
 
     /**
-     * Vytvori nove svetlo.
+     * Create new light.
      */
     Light(int _number, ptree& _config);
 
     /**
-     * Zdestruuje svetlo.
+     * Destroy the light.
      */
     virtual ~Light(void);
 
     /**
-     * Rozsviti svetlo.
+     * Switch on the light.
      */
     void switchOn(void);
 
     /**
-     * Zhasne svetlo.
+     * Switch of the light.
      */
     void switchOff(void);
 
     /**
-     * Nastavi ambientni slozku svetla.
-     * @param GLfloat _r Cervena slozka.
-     * @param GLfloat _g Zelena slozka.
-     * @param GLfloat _b Modra slozka.
-     * @param GLfloat _a Pruhlednost.
+     * Set up ambient color.
+     * @param _r Red color.
+     * @param _g Green color.
+     * @param _b Blue color.
+     * @param _a Alpha canal.
      */
     void setAmbient(GLfloat _r, GLfloat _g, GLfloat _b, GLfloat _a = 1.0);
 
     /**
-     * Nastavi difuzni slozku svetla.
-     * @param GLfloat _r Cervena slozka.
-     * @param GLfloat _g Zelena slozka.
-     * @param GLfloat _b Modra slozka.
-     * @param GLfloat _a Pruhlednost.
+     * Set up diffuse color.
+     * @param _r Red color.
+     * @param _g Green color.
+     * @param _b Blue color.
+     * @param _a Alpha canal.
      */
     void setDiffuse(GLfloat _r, GLfloat _g, GLfloat _b, GLfloat _a = 1.0);
 
     /**
-     * Nastavi zrcadlovou slozku svetla.
-     * @param GLfloat _r Cervena slozka.
-     * @param GLfloat _g Zelena slozka.
-     * @param GLfloat _b Modra slozka.
-     * @param GLfloat _a Pruhlednost.
+     * Set up specular color.
+     * @param _r Red color.
+     * @param _g Green color.
+     * @param _b Blue color.
+     * @param _a Alpha canal.
      */
     void setSpecular(GLfloat _r, GLfloat _g, GLfloat _b, GLfloat _a = 1.0);
 
     /**
-     * Nastavi pozici svetla.
-     * @param GLfloat _x Xova souradnice.
-     * @param GLfloat _y Yova souradnice.
-     * @param GLfloat _z Zova souradnice.
-     * @param GLfloat _w Wova souradnice.
+     * Set up position of light.
+     * @param _x X coordinate.
+     * @param _y Y coordinate.
+     * @param _z Z coordinate.
+     * @param _w W coordinate.
      */
     void setPosition(GLfloat _x, GLfloat _y, GLfloat _z, GLfloat _w = 0.0);
 
     /**
-     * Znovu umisti svetlo (kvuli transformacim).
+     * Replace light in the same position. Due to tranformation.
      */
     void rePosition(void);
 
     /**
-     * Nastavi smer bodoveho svetla.
-     * @param GLfloat _x Xova souradnice.
-     * @param GLfloat _y Yova souradnice.
-     * @param GLfloat _z Zova souradnice.
+     * Set up direction of spot light.
+     * @param _x X coordinate.
+     * @param _y Y coordinate.
+     * @param _z Z coordinate.
      */
     void setSpotDirection(GLfloat _x, GLfloat _y, GLfloat _z);
 
     /**
-     * Znovu nasmeruje svetlo (kvuli transformacim).
+     * Set up direction of spot light again.
      */
     void reSpotDirection(void);
 
     /**
-     * Nastaveni exponent bodoveho svetla.
-     * @param GLfloat _exponent Exponent.
+     * Set up exponent of spot light.
+     * @param _exponent Exponent.
      */
     void setSpotExponent(GLfloat _exponent);
 
     /**
-     * Nastavi hranicni uhel vyrezu bodoveho svetla.
-     * @param GLfloat _cutOff Uhel ve stupnich.
+     * Set up cutoff angle of spot light.
+     * @param _cutOff Angle in degrees.
      */
     void setSpotCutOff(GLfloat _cutOff);
 
     /**
-     * Nastavi utlum.
-     * @param GLfloat _constant Konstatni slozka.
-     * @param GLfloat _linear Linearni slozka.
-     * @param GLfloat _quadratic Kvadraticka slozka.
+     * Set up attenuation.
+     * @param _constant Constant element.
+     * @param _linear Linear element.
+     * @param _quadratic Quadratic element.
      */
     void setAttenuation(GLfloat _constant, GLfloat _linear, GLfloat _quadratic);
 
     /**
-     * Vrati stav svetla.
-     * @return false = zhasnuto, true rozsviceno.
+     * Get state of light.
+     * @return false = off, true = on.
      */
     bool getState(void);
 
@@ -123,43 +123,48 @@ public:
 
 private:
 
-    /** Oznaceni svetla. */
+    /** Light name. */
     GLenum name;
 
-    // Cislo svelta.
+    // Light identifier.
     int id;
 
-    /** Ambientni slozka barvy svetla. */
+    /** Ambient color. */
     GLfloat ambient[4];
 
-    /** Difusni slozka barvy svetla. */
+    /** Diffuse color. */
     GLfloat diffuse[4];
 
-    /** Zrcadlova slozka barvy svetla. */
+    /** Specular color. */
     GLfloat specular[4];
 
-    /** Pozice svetelneho zdroje. */
+    /** Position of light. */
     GLfloat position[4];
 
-    /** Smer bodoveho svetla. */
+    /** Direction of spot light. */
     GLfloat spotDirection[3];
 
-    /** Exponent bodoveho svetla. */
+    /** Exponent of spot light. */
     GLfloat spotExponent;
 
-    /** Hranicni uhel vyrezu bodoveho svetla. */
+    /** Cutoff angle of spot light. */
     GLfloat spotCutOff;
 
-    /** Faktor utlumu.
-     * 0 konstatni
-     * 1 linearni
-     * 2 kvadraticky
+    /** Factor of attenuation.
+     * [0] Constant element.
+     * [1] Linear element.
+     * [2] Quadratic element.
      */
     GLfloat attenuation[3];
 
-    /** Indikace zapnuti/vypnuti. */
+    /** Indicator of on/off. */
     bool enabled;  
 
+    /**
+     * Set up light from configuration.
+     * @param _name Light name.
+     * @param _config Configuration.
+     */
     void loadConfig(const string& _name, ptree& _config);
 };
 
